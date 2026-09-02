@@ -1,0 +1,2117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DevSuite | Professional Offline Developer Utilities & Security Suite</title>
+    
+    <!-- Primary SEO Meta Tags -->
+    <meta name="title" content="DevSuite | Professional Offline Developer Utilities & Security Suite">
+    <meta name="description" content="All-in-one privacy-first developer utility suite: UTF-8 Base64, URL encoder, JSON formatter, Multi-language code minifier, JWT inspector, HTML entities, and MD5/SHA cryptographic hash generators. 100% offline and client-side.">
+    <meta name="keywords" content="developer tools, base64 encoder utf-8, jwt decoder, json beautifier, code minifier, md5 hash generator, sha256 generator, url encoder, offline devsuite, formatting tools, privacy developer utilities">
+    <meta name="author" content="DevSuite Open Platform">
+    <meta name="robots" content="index, follow">
+    <meta name="theme-color" content="#0b1120">
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="DevSuite | Professional Offline Developer Utilities & Security Suite">
+    <meta property="og:description" content="High-performance client-side toolset for developers. Encode, decode, format, hash, and inspect tokens with zero server roundtrips.">
+    <meta property="og:site_name" content="DevSuite">
+
+    <!-- Twitter Cards -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="DevSuite | Professional Offline Developer Utilities">
+    <meta name="twitter:description" content="Secure, fast, client-side developer utility platform. Zero tracking, zero external dependencies.">
+
+    <!-- Structured Data (Schema.org) for Web Application & FAQ Rich Results -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@graph": [
+        {
+          "@type": "WebApplication",
+          "name": "DevSuite",
+          "applicationCategory": "DeveloperApplication",
+          "operatingSystem": "All",
+          "browserRequirements": "Requires JavaScript. Requires HTML5.",
+          "offers": {
+            "@type": "Offer",
+            "price": "0",
+            "priceCurrency": "USD"
+          },
+          "description": "Privacy-focused developer utilities including Base64 UTF-8 safe encode/decode, JWT payload inspector, code formatters, and cryptographic hash generators."
+        },
+        {
+          "@type": "FAQPage",
+          "mainEntity": [
+            {
+              "@type": "Question",
+              "name": "Is my data secure when using DevSuite?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "Yes, 100%. All operations—including hashing, Base64 conversion, JWT parsing, and code formatting—run entirely in your local browser sandbox using client-side JavaScript. No data is transmitted to external servers."
+              }
+            },
+            {
+              "@type": "Question",
+              "name": "How does Base64 handle UTF-8 Unicode characters and emojis safely?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "Standard browser btoa/atob routines only support Latin1 (ASCII). DevSuite uses modern TextEncoder and TextDecoder binary byte streaming to ensure multi-byte symbols, East Asian typography, and emojis are converted without mojibake or corrupt byte errors."
+              }
+            },
+            {
+              "@type": "Question",
+              "name": "Can DevSuite verify JWT signatures?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "The JWT tool inspects and decodes the Header and Payload claims and parses human-readable expiration dates. Cryptographic signature verification requires a shared secret or public RSA key and is intentionally omitted for client-side privacy."
+              }
+            },
+            {
+              "@type": "Question",
+              "name": "Are MD5 and SHA-1 safe for cryptographic security?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "MD5 and SHA-1 are cryptographically broken due to known collision vulnerabilities. They remain available for legacy checksums, deduplication, and file verification. For security-critical applications, always use SHA-256 or SHA-512."
+              }
+            }
+          ]
+        }
+      ]
+    }
+    </script>
+
+    <style>
+        /* CSS Variable Root & Theme Definitions */
+        :root {
+            --bg: #0b1120;
+            --card: #151f32;
+            --container: #1e293b;
+            --accent: #38bdf8;
+            --accent-rgb: 56, 189, 248;
+            --text: #f1f5f9;
+            --border: #334155;
+            --danger: #f87171;
+            --success: #34d399;
+            --warning: #fbbf24;
+            --font-sans: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+            --radius-sm: 6px;
+            --radius-md: 10px;
+            --radius-lg: 14px;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: var(--font-sans);
+            background-color: var(--bg);
+            color: var(--text);
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            transition: background-color 0.25s ease, color 0.25s ease;
+        }
+
+        /* Semantic Utilities */
+        .flex { display: flex; }
+        .flex-col { flex-direction: column; }
+        .flex-row { flex-direction: row; }
+        .flex-1 { flex: 1 1 0%; }
+        .items-center { align-items: center; }
+        .justify-between { justify-content: space-between; }
+        .justify-center { justify-content: center; }
+        .gap-1 { gap: 0.25rem; }
+        .gap-2 { gap: 0.5rem; }
+        .gap-3 { gap: 0.75rem; }
+        .gap-4 { gap: 1rem; }
+        .p-2 { padding: 0.5rem; }
+        .p-3 { padding: 0.75rem; }
+        .p-4 { padding: 1rem; }
+        .p-6 { padding: 1.5rem; }
+        .py-1 { padding-top: 0.25rem; padding-bottom: 0.25rem; }
+        .py-2 { padding-top: 0.5rem; padding-bottom: 0.5rem; }
+        .px-2 { padding-left: 0.5rem; padding-right: 0.5rem; }
+        .px-3 { padding-left: 0.75rem; padding-right: 0.75rem; }
+        .px-4 { padding-left: 1rem; padding-right: 1rem; }
+        .mt-1 { margin-top: 0.25rem; }
+        .mt-2 { margin-top: 0.5rem; }
+        .mt-3 { margin-top: 0.75rem; }
+        .mt-4 { margin-top: 1rem; }
+        .mb-1 { margin-bottom: 0.25rem; }
+        .mb-2 { margin-bottom: 0.5rem; }
+        .mb-3 { margin-bottom: 0.75rem; }
+        .mb-4 { margin-bottom: 1rem; }
+        .w-full { width: 100%; }
+        .h-full { height: 100%; }
+        .hidden { display: none !important; }
+        .relative { position: relative; }
+        .font-bold { font-weight: 700; }
+        .font-semibold { font-weight: 600; }
+        .font-mono { font-family: var(--font-mono); }
+        .text-xs { font-size: 0.75rem; }
+        .text-sm { font-size: 0.875rem; }
+        .text-base { font-size: 1rem; }
+        .text-lg { font-size: 1.125rem; }
+        .text-xl { font-size: 1.25rem; }
+        .truncate { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+        /* Buttons & Interactive Controls */
+        button, .btn {
+            background-color: var(--container);
+            color: var(--text);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            padding: 0.45rem 0.85rem;
+            font-size: 0.85rem;
+            font-weight: 500;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.4rem;
+            transition: all 0.15s ease;
+            user-select: none;
+            font-family: inherit;
+        }
+
+        button:hover, .btn:hover {
+            background-color: var(--border);
+            border-color: rgba(255, 255, 255, 0.2);
+        }
+
+        button:active, .btn:active {
+            transform: translateY(1px);
+        }
+
+        button.primary {
+            background-color: var(--accent);
+            color: #0b1120;
+            border-color: var(--accent);
+            font-weight: 600;
+        }
+
+        button.primary:hover {
+            filter: brightness(1.1);
+        }
+
+        button.icon-only {
+            padding: 0.45rem;
+            width: 32px;
+            height: 32px;
+        }
+
+        select, input[type="text"], input[type="search"] {
+            background-color: var(--container);
+            color: var(--text);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            padding: 0.45rem 0.75rem;
+            font-size: 0.85rem;
+            font-family: inherit;
+            outline: none;
+            transition: border-color 0.15s ease, box-shadow 0.15s ease;
+        }
+
+        select:focus, input[type="text"]:focus, input[type="search"]:focus {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 2px rgba(var(--accent-rgb), 0.25);
+        }
+
+        /* Top Navigation Header */
+        header {
+            background-color: var(--card);
+            height: 56px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 1.25rem;
+            border-bottom: 1px solid var(--border);
+            z-index: 20;
+            flex-shrink: 0;
+        }
+
+        .brand-logo {
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            font-weight: 700;
+            font-size: 1.15rem;
+            letter-spacing: -0.02em;
+            color: var(--text);
+        }
+
+        .brand-badge {
+            font-size: 0.65rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            padding: 0.15rem 0.45rem;
+            border-radius: 9999px;
+            background: rgba(var(--accent-rgb), 0.15);
+            color: var(--accent);
+            border: 1px solid rgba(var(--accent-rgb), 0.3);
+            font-weight: 600;
+        }
+
+        /* Application Body Layout */
+        .app-body {
+            display: flex;
+            flex: 1;
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* Sidebar Navigation */
+        aside {
+            width: 280px;
+            background-color: var(--card);
+            border-right: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            flex-shrink: 0;
+            transition: transform 0.25s ease;
+            z-index: 15;
+        }
+
+        .sidebar-search {
+            padding: 0.85rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .sidebar-search input {
+            width: 100%;
+        }
+
+        .sidebar-menu {
+            flex: 1;
+            overflow-y: auto;
+            padding: 0.6rem;
+        }
+
+        .menu-category {
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            font-weight: 700;
+            letter-spacing: 0.08em;
+            color: var(--text);
+            opacity: 0.5;
+            padding: 0.75rem 0.65rem 0.35rem 0.65rem;
+        }
+
+        .menu-item {
+            display: flex;
+            align-items: center;
+            gap: 0.65rem;
+            padding: 0.5rem 0.75rem;
+            margin-bottom: 0.15rem;
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            font-size: 0.85rem;
+            color: var(--text);
+            opacity: 0.85;
+            transition: all 0.15s ease;
+            border: 1px solid transparent;
+        }
+
+        .menu-item:hover {
+            background-color: var(--container);
+            opacity: 1;
+        }
+
+        .menu-item.active {
+            background-color: rgba(var(--accent-rgb), 0.12);
+            border-color: rgba(var(--accent-rgb), 0.35);
+            color: var(--accent);
+            font-weight: 600;
+            opacity: 1;
+        }
+
+        .menu-item svg {
+            flex-shrink: 0;
+            stroke-width: 2;
+        }
+
+        /* Mobile Drawer Backdrop */
+        .drawer-backdrop {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(2px);
+            z-index: 14;
+        }
+
+        /* Workspace & Split Pane */
+        main {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            min-width: 0;
+            background-color: var(--bg);
+            overflow: hidden;
+        }
+
+        .action-toolbar {
+            background-color: var(--card);
+            border-bottom: 1px solid var(--border);
+            padding: 0.6rem 1.25rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            flex-shrink: 0;
+        }
+
+        .tool-heading {
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+        }
+
+        .tool-title {
+            font-size: 1rem;
+            font-weight: 700;
+            color: var(--text);
+        }
+
+        .tool-desc {
+            font-size: 0.75rem;
+            opacity: 0.65;
+        }
+
+        /* Collapsible Tool Documentation & Specs Drawer */
+        .tool-spec-drawer {
+            background-color: var(--card);
+            border-bottom: 1px solid var(--border);
+            padding: 0.75rem 1.25rem;
+            font-size: 0.8rem;
+            line-height: 1.5;
+            display: none;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 1rem;
+            animation: fadeIn 0.2s ease;
+        }
+
+        .tool-spec-drawer.open {
+            display: grid;
+        }
+
+        .spec-card {
+            background: var(--container);
+            padding: 0.65rem 0.85rem;
+            border-radius: var(--radius-sm);
+            border: 1px solid var(--border);
+        }
+
+        .spec-card-title {
+            font-size: 0.7rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--accent);
+            margin-bottom: 0.25rem;
+        }
+
+        .split-workspace {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            flex: 1;
+            min-height: 0;
+            overflow: hidden;
+        }
+
+        .pane {
+            display: flex;
+            flex-direction: column;
+            min-height: 0;
+            min-width: 0;
+            background-color: var(--bg);
+            position: relative;
+        }
+
+        .pane:first-child {
+            border-right: 1px solid var(--border);
+        }
+
+        .pane-topbar {
+            background-color: var(--card);
+            border-bottom: 1px solid var(--border);
+            padding: 0.5rem 0.85rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-size: 0.8rem;
+            font-weight: 600;
+            flex-shrink: 0;
+        }
+
+        .pane-label {
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+            color: var(--text);
+            opacity: 0.9;
+        }
+
+        .editor-wrapper {
+            flex: 1;
+            position: relative;
+            display: flex;
+            min-height: 0;
+        }
+
+        textarea.code-editor {
+            width: 100%;
+            height: 100%;
+            resize: none;
+            border: none;
+            outline: none;
+            padding: 1rem;
+            font-family: var(--font-mono);
+            font-size: 0.85rem;
+            line-height: 1.6;
+            background-color: var(--bg);
+            color: var(--text);
+            tab-size: 4;
+            white-space: pre-wrap;
+            word-break: break-all;
+        }
+
+        textarea.code-editor::placeholder {
+            opacity: 0.35;
+        }
+
+        .pane-statusbar {
+            background-color: var(--card);
+            border-top: 1px solid var(--border);
+            padding: 0.35rem 0.85rem;
+            font-size: 0.75rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            color: var(--text);
+            opacity: 0.7;
+            font-family: var(--font-mono);
+            flex-shrink: 0;
+        }
+
+        .status-stats {
+            display: flex;
+            gap: 0.85rem;
+        }
+
+        /* Error Presentation */
+        .output-has-error {
+            color: var(--danger) !important;
+        }
+
+        /* Modals (Theme Studio & FAQ Knowledge Base) */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.65);
+            backdrop-filter: blur(4px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 100;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.2s ease;
+            padding: 1rem;
+        }
+
+        .modal-overlay.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .modal-box {
+            background-color: var(--card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            width: 100%;
+            max-width: 540px;
+            max-height: 90vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            transform: scale(0.96);
+            transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .modal-box.large {
+            max-width: 720px;
+        }
+
+        .modal-overlay.active .modal-box {
+            transform: scale(1);
+        }
+
+        .modal-header {
+            padding: 1.15rem 1.4rem;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .modal-title {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--text);
+        }
+
+        .modal-content {
+            padding: 1.4rem;
+            overflow-y: auto;
+        }
+
+        /* FAQ Accordion */
+        .faq-item {
+            border: 1px solid var(--border);
+            background: var(--container);
+            border-radius: var(--radius-sm);
+            margin-bottom: 0.6rem;
+            overflow: hidden;
+        }
+
+        .faq-question {
+            padding: 0.85rem 1rem;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-weight: 600;
+            font-size: 0.9rem;
+            user-select: none;
+        }
+
+        .faq-question:hover {
+            color: var(--accent);
+        }
+
+        .faq-answer {
+            padding: 0 1rem 0.85rem 1rem;
+            font-size: 0.85rem;
+            line-height: 1.6;
+            opacity: 0.85;
+            display: none;
+        }
+
+        .faq-item.open .faq-answer {
+            display: block;
+        }
+
+        .faq-item.open .faq-chevron {
+            transform: rotate(180deg);
+        }
+
+        .faq-chevron {
+            transition: transform 0.2s ease;
+        }
+
+        /* Theme Studio Grid */
+        .theme-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 0.6rem;
+            margin-bottom: 1.25rem;
+        }
+
+        .theme-preset-btn {
+            display: flex;
+            align-items: center;
+            justify-content: flex-start;
+            gap: 0.6rem;
+            padding: 0.65rem 0.85rem;
+            border-radius: var(--radius-sm);
+            border: 1px solid var(--border);
+            background: var(--container);
+            color: var(--text);
+            cursor: pointer;
+            font-size: 0.8rem;
+            transition: all 0.15s ease;
+        }
+
+        .theme-preset-btn:hover {
+            border-color: var(--accent);
+        }
+
+        .theme-preset-btn.active {
+            border-color: var(--accent);
+            background: rgba(var(--accent-rgb), 0.15);
+            font-weight: 600;
+        }
+
+        .theme-preview-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            flex-shrink: 0;
+        }
+
+        .color-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0.45rem 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .color-row:last-child {
+            border-bottom: none;
+        }
+
+        .color-row-label {
+            font-size: 0.85rem;
+            color: var(--text);
+        }
+
+        .color-input-container {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .hex-display {
+            font-family: var(--font-mono);
+            font-size: 0.75rem;
+            opacity: 0.75;
+            width: 65px;
+        }
+
+        input[type="color"] {
+            -webkit-appearance: none;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            width: 32px;
+            height: 32px;
+            cursor: pointer;
+            background: transparent;
+            padding: 0;
+        }
+
+        input[type="color"]::-webkit-color-swatch-wrapper { padding: 0; }
+        input[type="color"]::-webkit-color-swatch { border: none; border-radius: 5px; }
+
+        /* Toast Notifications */
+        .toast-holder {
+            position: fixed;
+            bottom: 1.5rem;
+            right: 1.5rem;
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            pointer-events: none;
+        }
+
+        .toast {
+            background-color: var(--card);
+            color: var(--text);
+            border: 1px solid var(--border);
+            border-left: 4px solid var(--accent);
+            padding: 0.75rem 1.15rem;
+            border-radius: var(--radius-sm);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+            font-size: 0.85rem;
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            pointer-events: auto;
+            animation: toastIn 0.25s ease-out forwards;
+        }
+
+        .toast.success { border-left-color: var(--success); }
+        .toast.error { border-left-color: var(--danger); }
+        .toast.warning { border-left-color: var(--warning); }
+
+        @keyframes toastIn {
+            from { transform: translateY(12px) scale(0.95); opacity: 0; }
+            to { transform: translateY(0) scale(1); opacity: 1; }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-4px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Responsive Mobile Layouts */
+        @media (max-width: 900px) {
+            .split-workspace {
+                grid-template-columns: 1fr;
+                grid-template-rows: 1fr 1fr;
+            }
+            .pane:first-child {
+                border-right: none;
+                border-bottom: 1px solid var(--border);
+            }
+            aside {
+                position: fixed;
+                top: 56px;
+                bottom: 0;
+                left: 0;
+                transform: translateX(-100%);
+            }
+            aside.drawer-open {
+                transform: translateX(0);
+            }
+            .drawer-backdrop.active {
+                display: block;
+            }
+        }
+
+        /* Custom Scrollbars */
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+        ::-webkit-scrollbar-thumb:hover { background: rgba(255, 255, 255, 0.35); }
+    </style>
+</head>
+<body>
+
+    <!-- Main Navigation Header -->
+    <header>
+        <div class="flex items-center gap-3">
+            <button id="btnToggleSidebar" class="icon-only" aria-label="Toggle Sidebar" style="display: none;">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+            </button>
+            <div class="brand-logo">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="16 18 22 12 16 6"></polyline>
+                    <polyline points="8 6 2 12 8 18"></polyline>
+                </svg>
+                DevSuite
+                <span class="brand-badge">PRO SUITE</span>
+            </div>
+        </div>
+
+        <div class="flex items-center gap-2">
+            <button id="btnOpenDocs" class="flex items-center gap-2" title="View technical guide and FAQs">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
+                Docs & FAQ
+            </button>
+            <button id="btnOpenStudio" class="flex items-center gap-2">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+                Theme Studio
+            </button>
+        </div>
+    </header>
+
+    <!-- Application Body -->
+    <div class="app-body">
+        <!-- Backdrop for mobile drawer -->
+        <div id="drawerBackdrop" class="drawer-backdrop"></div>
+
+        <!-- Sidebar Navigation -->
+        <aside id="sidebar">
+            <div class="sidebar-search">
+                <input type="search" id="toolSearch" placeholder="Search developer tools..." autocomplete="off">
+            </div>
+            <div class="sidebar-menu" id="toolMenu">
+                <!-- Populated via JavaScript -->
+            </div>
+        </aside>
+
+        <!-- Main Workspace -->
+        <main>
+            <!-- Action Toolbar -->
+            <div class="action-toolbar">
+                <div class="tool-heading">
+                    <div>
+                        <div class="flex items-center gap-2">
+                            <span class="tool-title" id="activeToolName">Base64 Encoder</span>
+                            <button id="btnToggleSpecs" class="text-xs py-1 px-2" title="Toggle technical specifications and documentation">
+                                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+                                Tool Specs
+                            </button>
+                        </div>
+                        <div class="tool-desc" id="activeToolDesc">Convert raw UTF-8 string into standard Base64 format</div>
+                    </div>
+                </div>
+
+                <div class="flex items-center gap-2" id="toolControls">
+                    <select id="codeLangSelect" class="hidden">
+                        <option value="javascript">JavaScript</option>
+                        <option value="html">HTML</option>
+                        <option value="css">CSS</option>
+                        <option value="php">PHP</option>
+                        <option value="sql">SQL</option>
+                    </select>
+                    
+                    <select id="jsonIndentSelect" class="hidden">
+                        <option value="2">2 Spaces</option>
+                        <option value="4" selected>4 Spaces</option>
+                        <option value="tab">Tab Indent</option>
+                    </select>
+
+                    <button id="btnLoadSample" title="Load sample test payload">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="12" y1="18" x2="12" y2="12"></line><line x1="9" y1="15" x2="15" y2="15"></line></svg>
+                        Sample
+                    </button>
+
+                    <button id="btnSwap" title="Swap input and output values">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m7 16-4-4 4-4"></path><path d="m17 8 4 4-4 4"></path><path d="M3 12h18"></path></svg>
+                        Swap
+                    </button>
+
+                    <button id="btnClearInput" title="Clear input content">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+                        Clear
+                    </button>
+                </div>
+            </div>
+
+            <!-- Collapsible Live Tool Documentation Drawer -->
+            <div id="toolSpecDrawer" class="tool-spec-drawer">
+                <div class="spec-card">
+                    <div class="spec-card-title">Algorithmic Mechanism</div>
+                    <div id="specMechanism" class="text-xs opacity-90">-</div>
+                </div>
+                <div class="spec-card">
+                    <div class="spec-card-title">Standards & RFC Compliance</div>
+                    <div id="specCompliance" class="text-xs opacity-90">-</div>
+                </div>
+                <div class="spec-card">
+                    <div class="spec-card-title">Security & Production Notes</div>
+                    <div id="specSecurity" class="text-xs opacity-90">-</div>
+                </div>
+            </div>
+
+            <!-- Split Panel Workspace -->
+            <div class="split-workspace">
+                <!-- Input Panel -->
+                <div class="pane">
+                    <div class="pane-topbar">
+                        <div class="pane-label">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="4 17 10 11 4 5"></polyline><line x1="12" y1="19" x2="20" y2="19"></line></svg>
+                            Source Input
+                        </div>
+                    </div>
+                    <div class="editor-wrapper">
+                        <textarea id="inputEditor" class="code-editor" placeholder="Type, paste, or load sample data here..." spellcheck="false"></textarea>
+                    </div>
+                    <div class="pane-statusbar">
+                        <div class="status-stats">
+                            <span id="inChars">0 chars</span>
+                            <span id="inWords">0 words</span>
+                            <span id="inLines">0 lines</span>
+                            <span id="inBytes">0 B</span>
+                        </div>
+                        <span>Live Sync</span>
+                    </div>
+                </div>
+
+                <!-- Output Panel -->
+                <div class="pane">
+                    <div class="pane-topbar">
+                        <div class="pane-label">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2"><polyline points="9 18 15 12 9 6"></polyline></svg>
+                            Processed Result
+                        </div>
+                        <button id="btnCopyOutput" class="primary py-1 px-3">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+                            Copy Output
+                        </button>
+                    </div>
+                    <div class="editor-wrapper">
+                        <textarea id="outputEditor" class="code-editor" readonly placeholder="Output will be computed automatically..." spellcheck="false"></textarea>
+                    </div>
+                    <div class="pane-statusbar">
+                        <div class="status-stats">
+                            <span id="outChars">0 chars</span>
+                            <span id="outLines">0 lines</span>
+                            <span id="outBytes">0 B</span>
+                        </div>
+                        <span id="engineStatus">Ready</span>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Documentation & FAQ Knowledge Base Modal -->
+    <div class="modal-overlay" id="docsModal">
+        <div class="modal-box large">
+            <div class="modal-header">
+                <div class="modal-title flex items-center gap-2">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
+                    Documentation & Technical FAQ
+                </div>
+                <button id="btnCloseDocs" class="icon-only" style="border: none; background: transparent;">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                </button>
+            </div>
+            <div class="modal-content">
+                <div class="mb-4">
+                    <input type="search" id="faqSearch" placeholder="Search developer guides and FAQ..." style="width: 100%;">
+                </div>
+
+                <div id="faqList">
+                    <!-- FAQ 1 -->
+                    <div class="faq-item open">
+                        <div class="faq-question">
+                            <span>How is data privacy guaranteed on DevSuite?</span>
+                            <svg class="faq-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                        </div>
+                        <div class="faq-answer">
+                            DevSuite is completely offline and serverless. All encoding, decoding, JSON formatting, token inspecting, and cryptographic hashing operations execute exclusively inside your browser using native JavaScript and the W3C Web Cryptography API. No payload or user input is ever sent over the network.
+                        </div>
+                    </div>
+
+                    <!-- FAQ 2 -->
+                    <div class="faq-item">
+                        <div class="faq-question">
+                            <span>Why doesn't standard Base64 handle emojis without corrupting?</span>
+                            <svg class="faq-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                        </div>
+                        <div class="faq-answer">
+                            Legacy browser methods (<code>btoa</code> and <code>atob</code>) only support 8-bit Latin1 character codepoints. When handling multi-byte Unicode strings (e.g. emojis, symbols, Cyrillic, or Asian characters), standard <code>btoa</code> throws a <code>DOMException</code>. DevSuite uses modern <code>TextEncoder</code> byte streaming and <code>Uint8Array</code> buffers to safely convert full multi-byte UTF-8 sequences without data loss or mojibake.
+                        </div>
+                    </div>
+
+                    <!-- FAQ 3 -->
+                    <div class="faq-item">
+                        <div class="faq-question">
+                            <span>How does the JWT (JSON Web Token) Decoder work?</span>
+                            <svg class="faq-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                        </div>
+                        <div class="faq-answer">
+                            A JSON Web Token consists of three base64url-encoded components separated by dots: Header, Payload, and Signature. DevSuite splits these segments, decodes the URI-safe base64 payload into formatted JSON, and parses standard Unix timestamps (<code>exp</code>, <code>iat</code>, <code>nbf</code>) into human-readable UTC dates with automatic expiration badges.
+                        </div>
+                    </div>
+
+                    <!-- FAQ 4 -->
+                    <div class="faq-item">
+                        <div class="faq-question">
+                            <span>When should I use MD5 vs SHA-256 or SHA-512?</span>
+                            <svg class="faq-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                        </div>
+                        <div class="faq-answer">
+                            <strong>MD5 & SHA-1:</strong> Cryptographically broken and susceptible to hash collisions. Only use them for legacy checksums, non-cryptographic deduplication, or cache keys.<br>
+                            <strong>SHA-256 & SHA-512:</strong> Cryptographically secure NIST-approved standards recommended for digital signatures, blockchain blocks, and data integrity verification.
+                        </div>
+                    </div>
+
+                    <!-- FAQ 5 -->
+                    <div class="faq-item">
+                        <div class="faq-question">
+                            <span>Can DevSuite be used offline without an internet connection?</span>
+                            <svg class="faq-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                        </div>
+                        <div class="faq-answer">
+                            Yes. DevSuite is completely self-contained in a single HTML file with zero external script or styling dependencies. You can save this file directly to your disk or USB drive and open it in any modern browser without an active internet connection.
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-4 flex justify-between items-center">
+                    <span class="text-xs opacity-60">DevSuite v2.6 • Privacy-First Architecture</span>
+                    <button id="btnDoneDocs" class="primary text-sm">Close Guide</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Theme & Customization Studio Modal -->
+    <div class="modal-overlay" id="studioModal">
+        <div class="modal-box">
+            <div class="modal-header">
+                <div class="modal-title">Theme & Color Studio</div>
+                <button id="btnCloseStudio" class="icon-only" style="border: none; background: transparent;">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                </button>
+            </div>
+            <div class="modal-content">
+                <div class="mb-4">
+                    <label class="text-xs uppercase font-bold tracking-wider mb-2 block" style="opacity: 0.6;">Preset Themes</label>
+                    <div class="theme-grid">
+                        <button class="theme-preset-btn" data-theme="midnight-blue">
+                            <span class="theme-preview-dot" style="background: #38bdf8;"></span> Midnight Blue
+                        </button>
+                        <button class="theme-preset-btn" data-theme="onyx-dark">
+                            <span class="theme-preview-dot" style="background: #a855f7;"></span> Onyx Dark
+                        </button>
+                        <button class="theme-preset-btn" data-theme="clean-light">
+                            <span class="theme-preview-dot" style="background: #2563eb;"></span> Clean Light
+                        </button>
+                        <button class="theme-preset-btn" data-theme="cyber-neon">
+                            <span class="theme-preview-dot" style="background: #22c55e;"></span> Cyber Neon
+                        </button>
+                        <button class="theme-preset-btn" data-theme="forest-emerald">
+                            <span class="theme-preview-dot" style="background: #10b981;"></span> Forest Emerald
+                        </button>
+                        <button class="theme-preset-btn" data-theme="dracula">
+                            <span class="theme-preview-dot" style="background: #ff79c6;"></span> Dracula
+                        </button>
+                    </div>
+                </div>
+
+                <div class="mb-4">
+                    <label class="text-xs uppercase font-bold tracking-wider mb-2 block" style="opacity: 0.6;">Custom Color Customizer</label>
+                    <div class="color-row">
+                        <span class="color-row-label">Background Color</span>
+                        <div class="color-input-container">
+                            <span class="hex-display" id="hex-bg">#0b1120</span>
+                            <input type="color" id="picker-bg" data-prop="--bg">
+                        </div>
+                    </div>
+                    <div class="color-row">
+                        <span class="color-row-label">Card Panels</span>
+                        <div class="color-input-container">
+                            <span class="hex-display" id="hex-card">#151f32</span>
+                            <input type="color" id="picker-card" data-prop="--card">
+                        </div>
+                    </div>
+                    <div class="color-row">
+                        <span class="color-row-label">Subtle Containers</span>
+                        <div class="color-input-container">
+                            <span class="hex-display" id="hex-container">#1e293b</span>
+                            <input type="color" id="picker-container" data-prop="--container">
+                        </div>
+                    </div>
+                    <div class="color-row">
+                        <span class="color-row-label">Primary Accent</span>
+                        <div class="color-input-container">
+                            <span class="hex-display" id="hex-accent">#38bdf8</span>
+                            <input type="color" id="picker-accent" data-prop="--accent">
+                        </div>
+                    </div>
+                    <div class="color-row">
+                        <span class="color-row-label">Main Text</span>
+                        <div class="color-input-container">
+                            <span class="hex-display" id="hex-text">#f1f5f9</span>
+                            <input type="color" id="picker-text" data-prop="--text">
+                        </div>
+                    </div>
+                    <div class="color-row">
+                        <span class="color-row-label">Border Lines</span>
+                        <div class="color-input-container">
+                            <span class="hex-display" id="hex-border">#334155</span>
+                            <input type="color" id="picker-border" data-prop="--border">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flex justify-between items-center mt-4">
+                    <button id="btnResetThemeDefaults" class="text-sm">Reset Defaults</button>
+                    <button id="btnDoneStudio" class="primary text-sm">Close & Save</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Notification Toast Anchor -->
+    <div class="toast-holder" id="toastHolder"></div>
+
+    <script>
+        /**
+         * Standalone Offline Algorithms & Pure JS Core
+         */
+
+        // 1. Pure JavaScript MD5 Implementation (RFC 1321)
+        const MD5Engine = (function() {
+            function safeAdd(x, y) {
+                const lsw = (x & 0xffff) + (y & 0xffff);
+                const msw = (x >> 16) + (y >> 16) + (lsw >> 16);
+                return (msw << 16) | (lsw & 0xffff);
+            }
+            function bitRol(num, cnt) {
+                return (num << cnt) | (num >>> (32 - cnt));
+            }
+            function md5Cmn(q, a, b, x, s, t) {
+                return safeAdd(bitRol(safeAdd(safeAdd(a, q), safeAdd(x, t)), s), b);
+            }
+            function md5FF(a, b, c, d, x, s, t) { return md5Cmn((b & c) | (~b & d), a, b, x, s, t); }
+            function md5GG(a, b, c, d, x, s, t) { return md5Cmn((b & d) | (c & ~d), a, b, x, s, t); }
+            function md5HH(a, b, c, d, x, s, t) { return md5Cmn(b ^ c ^ d, a, b, x, s, t); }
+            function md5II(a, b, c, d, x, s, t) { return md5Cmn(c ^ (b | ~d), a, b, x, s, t); }
+
+            function coreMD5(x, len) {
+                x[len >> 5] |= 0x80 << (len % 32);
+                x[(((len + 64) >>> 9) << 4) + 14] = len;
+                let a = 1732584193; let b = -271733879; let c = -1732584194; let d = 271733878;
+                for (let i = 0; i < x.length; i += 16) {
+                    const olda = a, oldb = b, oldc = c, oldd = d;
+                    a = md5FF(a, b, c, d, x[i+ 0], 7 , -680876936); d = md5FF(d, a, b, c, x[i+ 1], 12, -389564586); c = md5FF(c, d, a, b, x[i+ 2], 17,  606105819); b = md5FF(b, c, d, a, x[i+ 3], 22, -1044525330);
+                    a = md5FF(a, b, c, d, x[i+ 4], 7 , -176418897); d = md5FF(d, a, b, c, x[i+ 5], 12,  1200080426); c = md5FF(c, d, a, b, x[i+ 6], 17, -1473231341); b = md5FF(b, c, d, a, x[i+ 7], 22, -45705983);
+                    a = md5FF(a, b, c, d, x[i+ 8], 7 ,  1770035416); d = md5FF(d, a, b, c, x[i+ 9], 12, -1958414417); c = md5FF(c, d, a, b, x[i+10], 17, -42063); b = md5FF(b, c, d, a, x[i+11], 22, -1990404162);
+                    a = md5FF(a, b, c, d, x[i+12], 7 ,  1804603682); d = md5FF(d, a, b, c, x[i+13], 12, -40341101); c = md5FF(c, d, a, b, x[i+14], 17, -1502002290); b = md5FF(b, c, d, a, x[i+15], 22,  1236535329);
+                    a = md5GG(a, b, c, d, x[i+ 1], 5 , -165796510); d = md5GG(d, a, b, c, x[i+ 6], 9 , -1069501632); c = md5GG(c, d, a, b, x[i+11], 14,  643717713); b = md5GG(b, c, d, a, x[i+ 0], 20, -373897302);
+                    a = md5GG(a, b, c, d, x[i+ 5], 5 , -701558691); d = md5GG(d, a, b, c, x[i+10], 9 ,  38016083); c = md5GG(c, d, a, b, x[i+15], 14, -660478335); b = md5GG(b, c, d, a, x[i+ 4], 20, -405537848);
+                    a = md5GG(a, b, c, d, x[i+ 9], 5 ,  568446438); d = md5GG(d, a, b, c, x[i+14], 9 , -1019803690); c = md5GG(c, d, a, b, x[i+ 3], 14, -187363961); b = md5GG(b, c, d, a, x[i+ 8], 20,  1163531501);
+                    a = md5GG(a, b, c, d, x[i+13], 5 , -1444681467); d = md5GG(d, a, b, c, x[i+ 2], 9 , -51403784); c = md5GG(c, d, a, b, x[i+ 7], 14,  1735328473); b = md5GG(b, c, d, a, x[i+12], 20, -1926607734);
+                    a = md5HH(a, b, c, d, x[i+ 5], 4 , -378558); d = md5HH(d, a, b, c, x[i+ 8], 11, -2022574463); c = md5HH(c, d, a, b, x[i+11], 16,  1839030562); b = md5HH(b, c, d, a, x[i+14], 23, -35309556);
+                    a = md5HH(a, b, c, d, x[i+ 1], 4 , -1530992060); d = md5HH(d, a, b, c, x[i+ 4], 11,  1272893353); c = md5HH(c, d, a, b, x[i+ 7], 16, -155497632); b = md5HH(b, c, d, a, x[i+10], 23, -1094730640);
+                    a = md5HH(a, b, c, d, x[i+13], 4 ,  681279174); d = md5HH(d, a, b, c, x[i+ 0], 11, -358537222); c = md5HH(c, d, a, b, x[i+ 3], 16, -722521979); b = md5HH(b, c, d, a, x[i+ 6], 23,  76029189);
+                    a = md5HH(a, b, c, d, x[i+ 9], 4 , -640364487); d = md5HH(d, a, b, c, x[i+12], 11, -421815835); c = md5HH(c, d, a, b, x[i+15], 16,  530742520); b = md5HH(b, c, d, a, x[i+ 2], 23, -995338651);
+                    a = md5II(a, b, c, d, x[i+ 0], 6 , -198630844); d = md5II(d, a, b, c, x[i+ 7], 10,  1126891415); c = md5II(c, d, a, b, x[i+14], 15, -1416354905); b = md5II(b, c, d, a, x[i+ 5], 21, -57434055);
+                    a = md5II(a, b, c, d, x[i+12], 6 ,  1700485571); d = md5II(d, a, b, c, x[i+ 3], 10, -1894986606); c = md5II(c, d, a, b, x[i+10], 15, -1051523); b = md5II(b, c, d, a, x[i+ 1], 21, -2054922799);
+                    a = md5II(a, b, c, d, x[i+ 8], 6 ,  1873313359); d = md5II(d, a, b, c, x[i+15], 10, -30611744); c = md5II(c, d, a, b, x[i+ 6], 15, -1560198380); b = md5II(b, c, d, a, x[i+13], 21,  1309151649);
+                    a = md5II(a, b, c, d, x[i+ 4], 6 , -145523070); d = md5II(d, a, b, c, x[i+11], 10, -1120210379); c = md5II(c, d, a, b, x[i+ 2], 15,  718787259); b = md5II(b, c, d, a, x[i+ 9], 21, -343485551);
+                    a = safeAdd(a, olda); b = safeAdd(b, oldb); c = safeAdd(c, oldc); d = safeAdd(d, oldd);
+                }
+                return [a, b, c, d];
+            }
+
+            function str2binl(str) {
+                const bin = [];
+                const mask = (1 << 8) - 1;
+                for (let i = 0; i < str.length * 8; i += 8) {
+                    bin[i >> 5] |= (str.charCodeAt(i / 8) & mask) << (i % 32);
+                }
+                return bin;
+            }
+
+            function binl2hex(binarray) {
+                const hexTab = "0123456789abcdef";
+                let str = "";
+                for (let i = 0; i < binarray.length * 4; i++) {
+                    str += hexTab.charAt((binarray[i >> 2] >> ((i % 4) * 8 + 4)) & 0xf) +
+                           hexTab.charAt((binarray[i >> 2] >> ((i % 4) * 8)) & 0xf);
+                }
+                return str;
+            }
+
+            return function(str) {
+                const utf8 = unescape(encodeURIComponent(str));
+                return binl2hex(coreMD5(str2binl(utf8), utf8.length * 8));
+            };
+        })();
+
+        // 2. WebCrypto Hash Calculation Wrapper
+        async function calculateDigest(algorithm, text) {
+            const buffer = new TextEncoder().encode(text);
+            const digest = await crypto.subtle.digest(algorithm, buffer);
+            return Array.from(new Uint8Array(digest))
+                .map(b => b.toString(16).padStart(2, '0'))
+                .join('');
+        }
+
+        // 3. UTF-8 Safe Base64
+        function utf8ToBase64(str) {
+            const bytes = new TextEncoder().encode(str);
+            let binary = '';
+            for (let i = 0; i < bytes.byteLength; i++) {
+                binary += String.fromCharCode(bytes[i]);
+            }
+            return btoa(binary);
+        }
+
+        function base64ToUtf8(b64) {
+            const cleaned = b64.trim().replace(/\s+/g, '');
+            const binary = atob(cleaned);
+            const bytes = new Uint8Array(binary.length);
+            for (let i = 0; i < binary.length; i++) {
+                bytes[i] = binary.charCodeAt(i);
+            }
+            return new TextDecoder().decode(bytes);
+        }
+
+        // 4. Standalone Multi-Language Code Formatter & Minifier
+        const CodeProcessors = {
+            javascript: {
+                format: (code) => {
+                    let indent = 0;
+                    const lines = [];
+                    let token = '';
+                    let inString = null;
+
+                    const clean = code.replace(/\r\n/g, '\n').trim();
+                    for (let i = 0; i < clean.length; i++) {
+                        const char = clean[i];
+
+                        if (!inString && (char === '"' || char === "'" || char === '`')) {
+                            inString = char;
+                            token += char;
+                        } else if (inString && char === inString && clean[i - 1] !== '\\') {
+                            inString = null;
+                            token += char;
+                        } else if (!inString && char === '{') {
+                            token += ' {\n';
+                            indent += 4;
+                            lines.push(' '.repeat(Math.max(0, indent - 4)) + token.trim());
+                            token = '';
+                        } else if (!inString && char === '}') {
+                            if (token.trim()) lines.push(' '.repeat(indent) + token.trim());
+                            indent = Math.max(0, indent - 4);
+                            token = '';
+                            lines.push(' '.repeat(indent) + '}');
+                        } else if (!inString && char === ';') {
+                            token += ';\n';
+                            lines.push(' '.repeat(indent) + token.trim());
+                            token = '';
+                        } else {
+                            token += char;
+                        }
+                    }
+                    if (token.trim()) lines.push(' '.repeat(indent) + token.trim());
+                    return lines.filter(l => l.trim().length > 0).join('\n');
+                },
+                minify: (code) => {
+                    return code
+                        .replace(/\/\*[\s\S]*?\*\/|([^:]|^)\/\/.*$/gm, '$1')
+                        .replace(/\s+/g, ' ')
+                        .replace(/\s*([{};,:>+=!&|()?-])\s*/g, '$1')
+                        .trim();
+                }
+            },
+            html: {
+                format: (html) => {
+                    let formatted = '';
+                    let indent = 0;
+                    const tokens = html.replace(/>\s*</g, '><').replace(/</g, '\n<').split('\n').filter(Boolean);
+                    tokens.forEach(tok => {
+                        if (tok.match(/^<\/\w/)) {
+                            indent = Math.max(0, indent - 4);
+                        }
+                        formatted += ' '.repeat(indent) + tok.trim() + '\n';
+                        if (tok.match(/^<[^/?!][^>]*[^\/]>/) && !tok.match(/<input|<img|<br|<hr|<meta|<link/i)) {
+                            indent += 4;
+                        }
+                    });
+                    return formatted.trim();
+                },
+                minify: (html) => {
+                    return html
+                        .replace(/<!--[\s\S]*?-->/g, '')
+                        .replace(/>\s+</g, '><')
+                        .replace(/\s+/g, ' ')
+                        .trim();
+                }
+            },
+            css: {
+                format: (css) => {
+                    return css
+                        .replace(/\s+/g, ' ')
+                        .replace(/\{\s*/g, ' {\n    ')
+                        .replace(/;\s*/g, ';\n    ')
+                        .replace(/\s*\}\s*/g, '\n}\n\n')
+                        .replace(/\s*,\s*/g, ', ')
+                        .trim();
+                },
+                minify: (css) => {
+                    return css
+                        .replace(/\/\*[\s\S]*?\*\//g, '')
+                        .replace(/\s+/g, ' ')
+                        .replace(/\s*([{}:;,>])\s*/g, '$1')
+                        .replace(/;}/g, '}')
+                        .trim();
+                }
+            },
+            php: {
+                format: (php) => {
+                    return php
+                        .replace(/\s+/g, ' ')
+                        .replace(/\{/g, ' {\n    ')
+                        .replace(/\}/g, '\n}\n')
+                        .replace(/;/g, ';\n    ')
+                        .replace(/\n\s*\n/g, '\n')
+                        .trim();
+                },
+                minify: (php) => {
+                    return php
+                        .replace(/\/\*[\s\S]*?\*\/|\/\/.*|#.*/g, '')
+                        .replace(/\s+/g, ' ')
+                        .replace(/\s*([{}();,=])\s*/g, '$1')
+                        .trim();
+                }
+            },
+            sql: {
+                format: (sql) => {
+                    const keywords = [
+                        'SELECT', 'FROM', 'WHERE', 'AND', 'OR', 'LEFT JOIN', 'RIGHT JOIN', 
+                        'INNER JOIN', 'JOIN', 'ORDER BY', 'GROUP BY', 'HAVING', 'LIMIT', 
+                        'INSERT INTO', 'VALUES', 'UPDATE', 'SET', 'DELETE FROM', 'UNION ALL', 'UNION'
+                    ];
+                    let formatted = sql.replace(/\s+/g, ' ');
+                    keywords.forEach(kw => {
+                        const regex = new RegExp(`\\b${kw}\\b`, 'gi');
+                        formatted = formatted.replace(regex, `\n${kw.toUpperCase()}`);
+                    });
+                    return formatted.replace(/,\s*/g, ',\n    ').trim();
+                },
+                minify: (sql) => {
+                    return sql
+                        .replace(/--.*$/gm, '')
+                        .replace(/\/\*[\s\S]*?\*\//g, '')
+                        .replace(/\s+/g, ' ')
+                        .trim();
+                }
+            }
+        };
+
+        /**
+         * Global Tools Registry & Educational Specs
+         */
+        const ToolsRegistry = {
+            'b64-enc': {
+                name: 'Base64 Encoder',
+                category: 'Encoders & Decoders',
+                desc: 'Convert raw UTF-8 string into standard RFC 4648 Base64 format.',
+                sample: 'Hello Developer Suite! 🚀 ✨\nSupports Unicode, Symbols & Emoji.',
+                canSwap: true,
+                mechanism: 'Streams UTF-8 octets through TextEncoder into binary safe 6-bit radix representation.',
+                compliance: 'RFC 4648 §4 (Standard Base64 with padding)',
+                security: 'Safe for data transmission. Base64 is an encoding, NOT encryption.',
+                run: (input) => utf8ToBase64(input)
+            },
+            'b64-dec': {
+                name: 'Base64 Decoder',
+                category: 'Encoders & Decoders',
+                desc: 'Safely decode Base64 encoded strings back to original UTF-8.',
+                sample: 'SGVsbG8gRGV2ZWxvcGVyIFN1aXRlISDwn5mpIOKcqA==',
+                canSwap: true,
+                mechanism: 'Converts base64 chunks back into 8-bit byte arrays decoded via TextDecoder("utf-8").',
+                compliance: 'RFC 4648',
+                security: 'Prevents malformed URI or buffer overrun bugs from invalid inputs.',
+                run: (input) => base64ToUtf8(input)
+            },
+            'url-enc': {
+                name: 'URL Encoder',
+                category: 'Encoders & Decoders',
+                desc: 'Encode special characters into percent-encoded query/URI format.',
+                sample: 'https://example.com/search?query=developer suite&tags=javascript & css',
+                canSwap: true,
+                mechanism: 'Replaces characters outside the unreserved RFC 3986 set with %HEX escape sequences.',
+                compliance: 'RFC 3986 (URI Generic Syntax)',
+                security: 'Essential to prevent Query String Injection and malformed query routing.',
+                run: (input) => encodeURIComponent(input)
+            },
+            'url-dec': {
+                name: 'URL Decoder',
+                category: 'Encoders & Decoders',
+                desc: 'Decode percent-encoded URI strings back to readable characters.',
+                sample: 'https%3A%2F%2Fexample.com%2Fsearch%3Fquery%3Ddeveloper%20suite%26tags%3Djavascript%20%26%20css',
+                canSwap: true,
+                mechanism: 'Translates %XX hexadecimal byte tokens into original UTF-8 code point characters.',
+                compliance: 'RFC 3986',
+                security: 'Verify payload sanitization after decoding before DOM injection.',
+                run: (input) => decodeURIComponent(input)
+            },
+            'html-enc': {
+                name: 'HTML Entities Encoder',
+                category: 'Encoders & Decoders',
+                desc: 'Convert reserved HTML characters into safe numeric/named entities.',
+                sample: '<div class="alert" id="demo">\n    <span>"DevSuite" & \'Utilities\' < 2026 ></span>\n</div>',
+                canSwap: true,
+                mechanism: 'Maps reserved symbols (<, >, &, ", \') to their decimal and named entity equivalents.',
+                compliance: 'W3C HTML5 Specification §8.2.4',
+                security: 'First line of defense against Cross-Site Scripting (XSS) in HTML rendering.',
+                run: (input) => input.replace(/[\u00A0-\u9999<>&"']/g, c => '&#' + c.charCodeAt(0) + ';')
+            },
+            'html-dec': {
+                name: 'HTML Entities Decoder',
+                category: 'Encoders & Decoders',
+                desc: 'Convert HTML entities back into regular decoded characters.',
+                sample: '&#60;div class=&#34;alert&#34;&#62;&#38;copy; DevSuite&#60;/div&#62;',
+                canSwap: true,
+                mechanism: 'Parses entity string via standard DOMParser document tree tokenization.',
+                compliance: 'HTML Living Standard',
+                security: 'Never directly inject unescaped results into document.write or innerHTML.',
+                run: (input) => {
+                    const doc = new DOMParser().parseFromString(input, 'text/html');
+                    return doc.documentElement.textContent || '';
+                }
+            },
+            'json-fmt': {
+                name: 'JSON Beautifier',
+                category: 'JSON Tools',
+                desc: 'Parse, validate, and format JSON with custom indentation spaces.',
+                sample: '{"name":"DevSuite","version":"2.6.0","settings":{"theme":"midnight-blue","offline":true},"features":["base64","jwt","hashes","formatters"]}',
+                showIndent: true,
+                mechanism: 'Validates structure via ECMAScript JSON grammar tree and formats with selected spacing.',
+                compliance: 'ECMA-404 JSON Data Interchange Standard',
+                security: 'Rejects malformed syntax or unsafe circular object references.',
+                run: (input, opts) => {
+                    const parsed = JSON.parse(input);
+                    const indent = opts.indent === 'tab' ? '\t' : parseInt(opts.indent, 10);
+                    return JSON.stringify(parsed, null, indent);
+                }
+            },
+            'json-min': {
+                name: 'JSON Minifier',
+                category: 'JSON Tools',
+                desc: 'Remove all unnecessary whitespace and compact valid JSON into one line.',
+                sample: '{\n  "title": "Developer Toolset",\n  "version": 1,\n  "ready": true\n}',
+                mechanism: 'Parses AST structure and re-serializes with zero indentation or newlines.',
+                compliance: 'ECMA-404',
+                security: 'Reduces network payload sizes in REST/GraphQL responses.',
+                run: (input) => JSON.stringify(JSON.parse(input))
+            },
+            'code-fmt': {
+                name: 'Code Formatter',
+                category: 'Code Tools',
+                desc: 'Format JavaScript, HTML, CSS, PHP, or SQL using native formatters.',
+                sample: 'function calculateSum(a,b){const result=a+b;if(result>100){return "High: "+result;}return "Low: "+result;}',
+                showLang: true,
+                mechanism: 'Performs lexical grammar tokenization and applies standard nesting indentation.',
+                compliance: 'Clean Code formatting conventions',
+                security: 'Formatting executes strictly in client memory without external transpilers.',
+                run: (input, opts) => CodeProcessors[opts.lang].format(input)
+            },
+            'code-min': {
+                name: 'Code Minifier',
+                category: 'Code Tools',
+                desc: 'Strip comments and minimize whitespace for JS, HTML, CSS, PHP, & SQL.',
+                sample: '/* Multi-line Banner */\nbody {\n    background-color: #0b1120;\n    color: #f1f5f9;\n    margin: 0px;\n}',
+                showLang: true,
+                mechanism: 'Regex token scanner that eliminates single/multi-line comments and compresses tokens.',
+                compliance: 'Minification Standards',
+                security: 'Strips proprietary development comments and decreases asset payload weight.',
+                run: (input, opts) => CodeProcessors[opts.lang].minify(input)
+            },
+            'hash-inspect': {
+                name: 'All Hashes Generator',
+                category: 'Cryptography',
+                desc: 'Simultaneously compute MD5, SHA-1, SHA-256, and SHA-512 hashes.',
+                sample: 'The quick brown fox jumps over the lazy dog',
+                isAsync: true,
+                mechanism: 'Computes parallel cryptographic digests using MD5 engine and WebCrypto SubtleCrypto.',
+                compliance: 'FIPS PUB 180-4 / RFC 1321',
+                security: 'Useful for hash comparison and cryptographic fingerprint validation.',
+                run: async (input) => {
+                    const md5 = MD5Engine(input);
+                    const sha1 = await calculateDigest('SHA-1', input);
+                    const sha256 = await calculateDigest('SHA-256', input);
+                    const sha512 = await calculateDigest('SHA-512', input);
+
+                    return [
+                        `MD5 (128-bit):\n${md5}\n`,
+                        `SHA-1 (160-bit):\n${sha1}\n`,
+                        `SHA-256 (256-bit):\n${sha256}\n`,
+                        `SHA-512 (512-bit):\n${sha512}`
+                    ].join('\n');
+                }
+            },
+            'hash-md5': {
+                name: 'MD5 Hash',
+                category: 'Cryptography',
+                desc: 'Calculate 128-bit cryptographic MD5 checksum purely in vanilla JS.',
+                sample: 'DevSuite MD5 Hash Test',
+                mechanism: 'Four-round bitwise nonlinear transform operating on 512-bit message blocks.',
+                compliance: 'RFC 1321 (The MD5 Message-Digest Algorithm)',
+                security: 'NOT cryptographically secure. Use strictly for non-critical integrity verification.',
+                run: (input) => MD5Engine(input)
+            },
+            'hash-sha1': {
+                name: 'SHA-1 Hash',
+                category: 'Cryptography',
+                desc: 'Compute standard 160-bit SHA-1 hash offline.',
+                sample: 'DevSuite SHA-1 Hash Test',
+                isAsync: true,
+                mechanism: 'Hardware-accelerated WebCrypto engine generating 160-bit hash state.',
+                compliance: 'FIPS PUB 180-1 / RFC 3174',
+                security: 'Deprecated for TLS/SSL certificates and digital signatures due to collision weaknesses.',
+                run: (input) => calculateDigest('SHA-1', input)
+            },
+            'hash-sha256': {
+                name: 'SHA-256 Hash',
+                category: 'Cryptography',
+                desc: 'Generate strong 256-bit SHA-256 cryptographic digest.',
+                sample: 'DevSuite SHA-256 Security Test',
+                isAsync: true,
+                mechanism: 'SHA-2 family 256-bit iterative hash function utilizing 64 32-bit constant words.',
+                compliance: 'FIPS PUB 180-4 / NIST Approved',
+                security: 'Industry standard for password hashing (with salt), signatures, and Bitcoin POW.',
+                run: (input) => calculateDigest('SHA-256', input)
+            },
+            'hash-sha512': {
+                name: 'SHA-512 Hash',
+                category: 'Cryptography',
+                desc: 'Generate high-security 512-bit SHA-512 cryptographic digest.',
+                sample: 'DevSuite SHA-512 Security Test',
+                isAsync: true,
+                mechanism: 'SHA-2 family 512-bit iterative hash function operating on 64-bit words across 80 rounds.',
+                compliance: 'FIPS PUB 180-4 / NIST Standard',
+                security: 'Highest security level with extreme resistance against length extension attacks.',
+                run: (input) => calculateDigest('SHA-512', input)
+            },
+            'jwt-dec': {
+                name: 'JWT Decoder',
+                category: 'Cryptography',
+                desc: 'Decode JSON Web Tokens into Header, Payload, and Signature with timestamp badges.',
+                sample: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkFsaWNlIERldmVsb3BlciIsImlhdCI6MTUxNjIzOTAyMiwiZXhwIjoyNTI0NjA4MDAwfQ.4S_A0X0qJ-xS2Xj8Q9uY0r2B7H2o9P3G5M6j8I1x_k4',
+                mechanism: 'Decodes Base64URL header/payload claims and enriches timestamps with human-readable dates.',
+                compliance: 'RFC 7519 (JSON Web Token) / RFC 7515 (JWS)',
+                security: 'Decoding does NOT verify signature validity. Always verify signatures in your backend.',
+                run: (input) => {
+                    const segments = input.trim().split('.');
+                    if (segments.length !== 3) {
+                        throw new Error("Invalid JWT: A valid token must contain 3 dot-separated base64 segments.");
+                    }
+
+                    const parseJwtSegment = (seg) => {
+                        let base64 = seg.replace(/-/g, '+').replace(/_/g, '/');
+                        while (base64.length % 4) base64 += '=';
+                        return JSON.parse(base64ToUtf8(base64));
+                    };
+
+                    const header = parseJwtSegment(segments[0]);
+                    const payload = parseJwtSegment(segments[1]);
+
+                    const enrichedPayload = { ...payload };
+                    if (payload.iat && typeof payload.iat === 'number') {
+                        enrichedPayload['__iat_human'] = new Date(payload.iat * 1000).toUTCString();
+                    }
+                    if (payload.exp && typeof payload.exp === 'number') {
+                        const expDate = new Date(payload.exp * 1000);
+                        const isExpired = Date.now() > expDate.getTime();
+                        enrichedPayload['__exp_human'] = `${expDate.toUTCString()} (${isExpired ? 'EXPIRED' : 'ACTIVE / VALID'})`;
+                    }
+                    if (payload.nbf && typeof payload.nbf === 'number') {
+                        enrichedPayload['__nbf_human'] = new Date(payload.nbf * 1000).toUTCString();
+                    }
+
+                    return JSON.stringify({
+                        HEADER: header,
+                        PAYLOAD: enrichedPayload,
+                        SIGNATURE_RAW: segments[2]
+                    }, null, 4);
+                }
+            }
+        };
+
+        /**
+         * Theme Studio Preset Colors
+         */
+        const ThemePresets = {
+            'midnight-blue': {
+                '--bg': '#0b1120',
+                '--card': '#151f32',
+                '--container': '#1e293b',
+                '--accent': '#38bdf8',
+                '--text': '#f1f5f9',
+                '--border': '#334155'
+            },
+            'onyx-dark': {
+                '--bg': '#0a0a0c',
+                '--card': '#141419',
+                '--container': '#202028',
+                '--accent': '#a855f7',
+                '--text': '#e2e8f0',
+                '--border': '#2d2d38'
+            },
+            'clean-light': {
+                '--bg': '#f8fafc',
+                '--card': '#ffffff',
+                '--container': '#e2e8f0',
+                '--accent': '#2563eb',
+                '--text': '#0f172a',
+                '--border': '#cbd5e1'
+            },
+            'cyber-neon': {
+                '--bg': '#05080c',
+                '--card': '#0c121d',
+                '--container': '#142032',
+                '--accent': '#22c55e',
+                '--text': '#f0fdf4',
+                '--border': '#15803d'
+            },
+            'forest-emerald': {
+                '--bg': '#06281e',
+                '--card': '#0a382b',
+                '--container': '#0f4c3a',
+                '--accent': '#10b981',
+                '--text': '#ecfdf5',
+                '--border': '#1b634e'
+            },
+            'dracula': {
+                '--bg': '#21222c',
+                '--card': '#282a36',
+                '--container': '#44475a',
+                '--accent': '#ff79c6',
+                '--text': '#f8f8f2',
+                '--border': '#6272a4'
+            }
+        };
+
+        /**
+         * State Controller & Application Initialization
+         */
+        const State = {
+            activeTool: localStorage.getItem('devsuite_active_tool') || 'b64-enc',
+            activeTheme: localStorage.getItem('devsuite_active_theme') || 'midnight-blue',
+            customColors: JSON.parse(localStorage.getItem('devsuite_custom_colors') || '{}'),
+            drafts: JSON.parse(localStorage.getItem('devsuite_tool_drafts') || '{}'),
+            selectedLang: localStorage.getItem('devsuite_code_lang') || 'javascript',
+            selectedIndent: localStorage.getItem('devsuite_json_indent') || '4',
+            showSpecs: localStorage.getItem('devsuite_show_specs') === 'true'
+        };
+
+        // UI Element References
+        const UI = {
+            sidebar: document.getElementById('sidebar'),
+            drawerBackdrop: document.getElementById('drawerBackdrop'),
+            btnToggleSidebar: document.getElementById('btnToggleSidebar'),
+            toolMenu: document.getElementById('toolMenu'),
+            toolSearch: document.getElementById('toolSearch'),
+            activeToolName: document.getElementById('activeToolName'),
+            activeToolDesc: document.getElementById('activeToolDesc'),
+            btnToggleSpecs: document.getElementById('btnToggleSpecs'),
+            toolSpecDrawer: document.getElementById('toolSpecDrawer'),
+            specMechanism: document.getElementById('specMechanism'),
+            specCompliance: document.getElementById('specCompliance'),
+            specSecurity: document.getElementById('specSecurity'),
+            codeLangSelect: document.getElementById('codeLangSelect'),
+            jsonIndentSelect: document.getElementById('jsonIndentSelect'),
+            btnLoadSample: document.getElementById('btnLoadSample'),
+            btnSwap: document.getElementById('btnSwap'),
+            btnClearInput: document.getElementById('btnClearInput'),
+            inputEditor: document.getElementById('inputEditor'),
+            outputEditor: document.getElementById('outputEditor'),
+            btnCopyOutput: document.getElementById('btnCopyOutput'),
+            inChars: document.getElementById('inChars'),
+            inWords: document.getElementById('inWords'),
+            inLines: document.getElementById('inLines'),
+            inBytes: document.getElementById('inBytes'),
+            outChars: document.getElementById('outChars'),
+            outLines: document.getElementById('outLines'),
+            outBytes: document.getElementById('outBytes'),
+            engineStatus: document.getElementById('engineStatus'),
+            docsModal: document.getElementById('docsModal'),
+            btnOpenDocs: document.getElementById('btnOpenDocs'),
+            btnCloseDocs: document.getElementById('btnCloseDocs'),
+            btnDoneDocs: document.getElementById('btnDoneDocs'),
+            faqSearch: document.getElementById('faqSearch'),
+            studioModal: document.getElementById('studioModal'),
+            btnOpenStudio: document.getElementById('btnOpenStudio'),
+            btnCloseStudio: document.getElementById('btnCloseStudio'),
+            btnDoneStudio: document.getElementById('btnDoneStudio'),
+            btnResetThemeDefaults: document.getElementById('btnResetThemeDefaults'),
+            toastHolder: document.getElementById('toastHolder')
+        };
+
+        // Toast Feedback System
+        function triggerToast(message, type = 'success') {
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            
+            const iconSvg = type === 'success'
+                ? `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg>`
+                : `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>`;
+
+            toast.innerHTML = `${iconSvg} <span>${message}</span>`;
+            UI.toastHolder.appendChild(toast);
+
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                toast.style.transform = 'translateY(10px)';
+                toast.style.transition = 'all 0.2s ease';
+                setTimeout(() => toast.remove(), 200);
+            }, 2600);
+        }
+
+        // Color Helper Functions
+        function hexToRgb(hex) {
+            const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+            return result ? `${parseInt(result[1], 16)}, ${parseInt(result[2], 16)}, ${parseInt(result[3], 16)}` : '56, 189, 248';
+        }
+
+        function applyTheme(themeName, customOverrides = null) {
+            const theme = customOverrides || ThemePresets[themeName] || ThemePresets['midnight-blue'];
+            const root = document.documentElement;
+
+            for (const [prop, val] of Object.entries(theme)) {
+                root.style.setProperty(prop, val);
+                if (prop === '--accent') {
+                    root.style.setProperty('--accent-rgb', hexToRgb(val));
+                }
+                const picker = document.querySelector(`input[data-prop="${prop}"]`);
+                const hexLabel = document.getElementById(`hex-${prop.replace('--', '')}`);
+                if (picker) picker.value = val;
+                if (hexLabel) hexLabel.textContent = val;
+            }
+
+            document.querySelectorAll('.theme-preset-btn').forEach(btn => {
+                btn.classList.toggle('active', btn.dataset.theme === themeName && !customOverrides);
+            });
+        }
+
+        // Build Sidebar Navigation
+        function renderSidebar(searchQuery = '') {
+            const categories = {};
+            for (const [id, tool] of Object.entries(ToolsRegistry)) {
+                if (searchQuery && !tool.name.toLowerCase().includes(searchQuery.toLowerCase()) && !tool.desc.toLowerCase().includes(searchQuery.toLowerCase())) {
+                    continue;
+                }
+                if (!categories[tool.category]) categories[tool.category] = [];
+                categories[tool.category].push({ id, ...tool });
+            }
+
+            let html = '';
+            for (const [catName, items] of Object.entries(categories)) {
+                html += `<div class="menu-category">${catName}</div>`;
+                items.forEach(item => {
+                    const isActive = item.id === State.activeTool;
+                    html += `
+                        <div class="menu-item ${isActive ? 'active' : ''}" data-tool="${item.id}">
+                            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                                <circle cx="12" cy="12" r="3"></circle>
+                                <path d="M12 2v2m0 16v2M2 12h2m16 0h2"></path>
+                            </svg>
+                            <span class="truncate">${item.name}</span>
+                        </div>
+                    `;
+                });
+            }
+
+            if (Object.keys(categories).length === 0) {
+                html = `<div style="padding: 1rem; text-align: center; font-size: 0.8rem; opacity: 0.5;">No tools matching "${searchQuery}"</div>`;
+            }
+
+            UI.toolMenu.innerHTML = html;
+
+            UI.toolMenu.querySelectorAll('.menu-item').forEach(el => {
+                el.addEventListener('click', () => {
+                    switchTool(el.dataset.tool);
+                    if (window.innerWidth <= 900) {
+                        UI.sidebar.classList.remove('drawer-open');
+                        UI.drawerBackdrop.classList.remove('active');
+                    }
+                });
+            });
+        }
+
+        // Switch Active Tool
+        function switchTool(toolId) {
+            if (!ToolsRegistry[toolId]) toolId = 'b64-enc';
+            State.activeTool = toolId;
+            localStorage.setItem('devsuite_active_tool', toolId);
+
+            const tool = ToolsRegistry[toolId];
+            UI.activeToolName.textContent = tool.name;
+            UI.activeToolDesc.textContent = tool.desc;
+
+            // Update Technical Specs Drawer
+            UI.specMechanism.textContent = tool.mechanism || 'Client-side processing';
+            UI.specCompliance.textContent = tool.compliance || 'W3C Standard';
+            UI.specSecurity.textContent = tool.security || 'Local sandbox execution';
+
+            // Configure Control Visibility
+            UI.codeLangSelect.classList.toggle('hidden', !tool.showLang);
+            UI.jsonIndentSelect.classList.toggle('hidden', !tool.showIndent);
+            UI.btnSwap.classList.toggle('hidden', !tool.canSwap);
+
+            // Restore Draft
+            UI.inputEditor.value = State.drafts[toolId] || '';
+
+            // Update Menu Highlight
+            renderSidebar(UI.toolSearch.value);
+
+            // Execute Live Processing
+            processActiveTool();
+        }
+
+        // Live Processing Core
+        let processDebounce = null;
+        async function processActiveTool() {
+            const tool = ToolsRegistry[State.activeTool];
+            const inputVal = UI.inputEditor.value;
+
+            // Update Input Stats
+            updateInputStats(inputVal);
+
+            if (!inputVal) {
+                UI.outputEditor.value = '';
+                UI.outputEditor.classList.remove('output-has-error');
+                updateOutputStats('');
+                UI.engineStatus.textContent = 'Ready';
+                return;
+            }
+
+            UI.engineStatus.textContent = 'Processing...';
+
+            try {
+                const options = {
+                    lang: UI.codeLangSelect.value,
+                    indent: UI.jsonIndentSelect.value
+                };
+
+                let output = '';
+                if (tool.isAsync) {
+                    output = await tool.run(inputVal, options);
+                } else {
+                    output = tool.run(inputVal, options);
+                }
+
+                UI.outputEditor.value = output;
+                UI.outputEditor.classList.remove('output-has-error');
+                updateOutputStats(output);
+                UI.engineStatus.textContent = 'Synchronized';
+            } catch (err) {
+                UI.outputEditor.value = `Syntax Error:\n${err.message || 'Unable to process input'}`;
+                UI.outputEditor.classList.add('output-has-error');
+                updateOutputStats('');
+                UI.engineStatus.textContent = 'Error';
+            }
+        }
+
+        function triggerDebouncedProcess() {
+            clearTimeout(processDebounce);
+            processDebounce = setTimeout(() => {
+                // Save draft
+                State.drafts[State.activeTool] = UI.inputEditor.value;
+                localStorage.setItem('devsuite_tool_drafts', JSON.stringify(State.drafts));
+                processActiveTool();
+            }, 120);
+        }
+
+        // Stats Calculators
+        function updateInputStats(text) {
+            const chars = text.length;
+            const words = text.trim() ? text.trim().split(/\s+/).length : 0;
+            const lines = text ? text.split('\n').length : 0;
+            const bytes = new TextEncoder().encode(text).length;
+
+            UI.inChars.textContent = `${chars} chars`;
+            UI.inWords.textContent = `${words} words`;
+            UI.inLines.textContent = `${lines} lines`;
+            UI.inBytes.textContent = formatBytes(bytes);
+        }
+
+        function updateOutputStats(text) {
+            const chars = text.length;
+            const lines = text ? text.split('\n').length : 0;
+            const bytes = new TextEncoder().encode(text).length;
+
+            UI.outChars.textContent = `${chars} chars`;
+            UI.outLines.textContent = `${lines} lines`;
+            UI.outBytes.textContent = formatBytes(bytes);
+        }
+
+        function formatBytes(bytes) {
+            if (bytes < 1024) return bytes + ' B';
+            if (bytes < 1048576) return (bytes / 1024).toFixed(1) + ' KB';
+            return (bytes / 1048576).toFixed(2) + ' MB';
+        }
+
+        /**
+         * Event Listeners & Interactive Handlers
+         */
+        function setupEventListeners() {
+            // Live Textarea Input
+            UI.inputEditor.addEventListener('input', triggerDebouncedProcess);
+
+            // Responsive Mobile Drawer
+            function checkWindowSize() {
+                if (window.innerWidth <= 900) {
+                    UI.btnToggleSidebar.style.display = 'inline-flex';
+                } else {
+                    UI.btnToggleSidebar.style.display = 'none';
+                    UI.sidebar.classList.remove('drawer-open');
+                    UI.drawerBackdrop.classList.remove('active');
+                }
+            }
+            window.addEventListener('resize', checkWindowSize);
+            checkWindowSize();
+
+            UI.btnToggleSidebar.addEventListener('click', () => {
+                UI.sidebar.classList.toggle('drawer-open');
+                UI.drawerBackdrop.classList.toggle('active');
+            });
+
+            UI.drawerBackdrop.addEventListener('click', () => {
+                UI.sidebar.classList.remove('drawer-open');
+                UI.drawerBackdrop.classList.remove('active');
+            });
+
+            // Search Bar Filter
+            UI.toolSearch.addEventListener('input', (e) => {
+                renderSidebar(e.target.value);
+            });
+
+            // Action Buttons
+            UI.btnClearInput.addEventListener('click', () => {
+                UI.inputEditor.value = '';
+                triggerDebouncedProcess();
+                triggerToast('Input editor cleared', 'warning');
+            });
+
+            UI.btnLoadSample.addEventListener('click', () => {
+                const tool = ToolsRegistry[State.activeTool];
+                if (tool && tool.sample) {
+                    UI.inputEditor.value = tool.sample;
+                    triggerDebouncedProcess();
+                    triggerToast('Loaded sample test payload');
+                }
+            });
+
+            UI.btnSwap.addEventListener('click', () => {
+                const currentOut = UI.outputEditor.value;
+                if (!currentOut || UI.outputEditor.classList.contains('output-has-error')) {
+                    triggerToast('No valid output available to swap', 'error');
+                    return;
+                }
+                UI.inputEditor.value = currentOut;
+                triggerDebouncedProcess();
+                triggerToast('Swapped output into input');
+            });
+
+            // Toggle Tech Specs
+            UI.btnToggleSpecs.addEventListener('click', () => {
+                State.showSpecs = !State.showSpecs;
+                localStorage.setItem('devsuite_show_specs', State.showSpecs);
+                UI.toolSpecDrawer.classList.toggle('open', State.showSpecs);
+            });
+
+            if (State.showSpecs) {
+                UI.toolSpecDrawer.classList.add('open');
+            }
+
+            // Clipboard Copy
+            UI.btnCopyOutput.addEventListener('click', () => {
+                const val = UI.outputEditor.value;
+                if (!val || UI.outputEditor.classList.contains('output-has-error')) {
+                    triggerToast('Nothing to copy', 'warning');
+                    return;
+                }
+
+                if (navigator.clipboard && window.isSecureContext) {
+                    navigator.clipboard.writeText(val).then(() => {
+                        triggerToast('Copied output to clipboard!');
+                    }).catch(() => fallbackCopy(val));
+                } else {
+                    fallbackCopy(val);
+                }
+            });
+
+            function fallbackCopy(text) {
+                UI.outputEditor.select();
+                try {
+                    document.execCommand('copy');
+                    triggerToast('Copied output to clipboard!');
+                } catch {
+                    triggerToast('Failed to copy to clipboard', 'error');
+                }
+            }
+
+            // Options Listeners
+            UI.codeLangSelect.addEventListener('change', (e) => {
+                State.selectedLang = e.target.value;
+                localStorage.setItem('devsuite_code_lang', e.target.value);
+                processActiveTool();
+            });
+
+            UI.jsonIndentSelect.addEventListener('change', (e) => {
+                State.selectedIndent = e.target.value;
+                localStorage.setItem('devsuite_json_indent', e.target.value);
+                processActiveTool();
+            });
+
+            // Docs & FAQ Modal
+            UI.btnOpenDocs.addEventListener('click', () => UI.docsModal.classList.add('active'));
+            UI.btnCloseDocs.addEventListener('click', () => UI.docsModal.classList.remove('active'));
+            UI.btnDoneDocs.addEventListener('click', () => UI.docsModal.classList.remove('active'));
+            UI.docsModal.addEventListener('click', (e) => {
+                if (e.target === UI.docsModal) UI.docsModal.classList.remove('active');
+            });
+
+            // FAQ Accordion Handlers
+            document.querySelectorAll('.faq-question').forEach(q => {
+                q.addEventListener('click', () => {
+                    const item = q.closest('.faq-item');
+                    item.classList.toggle('open');
+                });
+            });
+
+            // FAQ Search Filter
+            UI.faqSearch.addEventListener('input', (e) => {
+                const term = e.target.value.toLowerCase();
+                document.querySelectorAll('.faq-item').forEach(item => {
+                    const qText = item.querySelector('.faq-question').textContent.toLowerCase();
+                    const aText = item.querySelector('.faq-answer').textContent.toLowerCase();
+                    if (qText.includes(term) || aText.includes(term)) {
+                        item.style.display = 'block';
+                    } else {
+                        item.style.display = 'none';
+                    }
+                });
+            });
+
+            // Studio Modal
+            UI.btnOpenStudio.addEventListener('click', () => UI.studioModal.classList.add('active'));
+            UI.btnCloseStudio.addEventListener('click', () => UI.studioModal.classList.remove('active'));
+            UI.btnDoneStudio.addEventListener('click', () => UI.studioModal.classList.remove('active'));
+            UI.studioModal.addEventListener('click', (e) => {
+                if (e.target === UI.studioModal) UI.studioModal.classList.remove('active');
+            });
+
+            // Theme Preset Selection
+            document.querySelectorAll('.theme-preset-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const t = btn.dataset.theme;
+                    State.activeTheme = t;
+                    State.customColors = {};
+                    localStorage.setItem('devsuite_active_theme', t);
+                    localStorage.removeItem('devsuite_custom_colors');
+                    applyTheme(t);
+                    triggerToast(`Switched theme to ${btn.textContent.trim()}`);
+                });
+            });
+
+            // Live Custom Color Pickers
+            document.querySelectorAll('input[type="color"]').forEach(picker => {
+                picker.addEventListener('input', (e) => {
+                    const prop = e.target.dataset.prop;
+                    const val = e.target.value;
+                    const root = document.documentElement;
+
+                    root.style.setProperty(prop, val);
+                    if (prop === '--accent') {
+                        root.style.setProperty('--accent-rgb', hexToRgb(val));
+                    }
+
+                    const hexLabel = document.getElementById(`hex-${prop.replace('--', '')}`);
+                    if (hexLabel) hexLabel.textContent = val;
+
+                    document.querySelectorAll('.theme-preset-btn').forEach(btn => btn.classList.remove('active'));
+
+                    State.customColors[prop] = val;
+                    localStorage.setItem('devsuite_custom_colors', JSON.stringify(State.customColors));
+                });
+            });
+
+            // Reset Theme to Default
+            UI.btnResetThemeDefaults.addEventListener('click', () => {
+                State.activeTheme = 'midnight-blue';
+                State.customColors = {};
+                localStorage.setItem('devsuite_active_theme', 'midnight-blue');
+                localStorage.removeItem('devsuite_custom_colors');
+                applyTheme('midnight-blue');
+                triggerToast('Theme reset to Midnight Blue default');
+            });
+        }
+
+        // Initialize Application
+        function initApp() {
+            if (Object.keys(State.customColors).length > 0) {
+                applyTheme(State.activeTheme, State.customColors);
+            } else {
+                applyTheme(State.activeTheme);
+            }
+
+            UI.codeLangSelect.value = State.selectedLang;
+            UI.jsonIndentSelect.value = State.selectedIndent;
+
+            setupEventListeners();
+            renderSidebar();
+            switchTool(State.activeTool);
+        }
+
+        // Boot
+        window.addEventListener('DOMContentLoaded', initApp);
+    </script>
+</body>
+</html>
