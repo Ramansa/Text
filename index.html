@@ -92,7 +92,6 @@
     </script>
 
     <style>
-        /* CSS Variable Root & Theme Definitions */
         :root {
             --bg: #0b1120;
             --card: #151f32;
@@ -128,7 +127,6 @@
             transition: background-color 0.25s ease, color 0.25s ease;
         }
 
-        /* Semantic Utilities */
         .flex { display: flex; }
         .flex-col { flex-direction: column; }
         .flex-row { flex-direction: row; }
@@ -171,7 +169,6 @@
         .text-xl { font-size: 1.25rem; }
         .truncate { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 
-        /* Buttons & Interactive Controls */
         button, .btn {
             background-color: var(--container);
             color: var(--text);
@@ -233,7 +230,6 @@
             box-shadow: 0 0 0 2px rgba(var(--accent-rgb), 0.25);
         }
 
-        /* Top Navigation Header */
         header {
             background-color: var(--card);
             height: 56px;
@@ -268,7 +264,6 @@
             font-weight: 600;
         }
 
-        /* Application Body Layout */
         .app-body {
             display: flex;
             flex: 1;
@@ -276,7 +271,6 @@
             position: relative;
         }
 
-        /* Sidebar Navigation */
         aside {
             width: 280px;
             background-color: var(--card);
@@ -346,7 +340,6 @@
             stroke-width: 2;
         }
 
-        /* Mobile Drawer Backdrop */
         .drawer-backdrop {
             display: none;
             position: fixed;
@@ -356,7 +349,6 @@
             z-index: 14;
         }
 
-        /* Workspace & Split Pane */
         main {
             flex: 1;
             display: flex;
@@ -395,7 +387,6 @@
             opacity: 0.65;
         }
 
-        /* Collapsible Tool Documentation & Specs Drawer */
         .tool-spec-drawer {
             background-color: var(--card);
             border-bottom: 1px solid var(--border);
@@ -516,12 +507,10 @@
             gap: 0.85rem;
         }
 
-        /* Error Presentation */
         .output-has-error {
             color: var(--danger) !important;
         }
 
-        /* Modals */
         .modal-overlay {
             position: fixed;
             inset: 0;
@@ -584,7 +573,6 @@
             overflow-y: auto;
         }
 
-        /* FAQ Accordion */
         .faq-item {
             border: 1px solid var(--border);
             background: var(--container);
@@ -628,7 +616,6 @@
             transition: transform 0.2s ease;
         }
 
-        /* Theme Studio Grid */
         .theme-grid {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
@@ -713,7 +700,6 @@
         input[type="color"]::-webkit-color-swatch-wrapper { padding: 0; }
         input[type="color"]::-webkit-color-swatch { border: none; border-radius: 5px; }
 
-        /* Toast Notifications */
         .toast-holder {
             position: fixed;
             bottom: 1.5rem;
@@ -755,7 +741,6 @@
             to { opacity: 1; transform: translateY(0); }
         }
 
-        /* Responsive Mobile Layouts */
         @media (max-width: 900px) {
             .split-workspace {
                 grid-template-columns: 1fr;
@@ -780,7 +765,6 @@
             }
         }
 
-        /* Custom Scrollbars */
         ::-webkit-scrollbar { width: 6px; height: 6px; }
         ::-webkit-scrollbar-track { background: transparent; }
         ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
@@ -789,7 +773,6 @@
 </head>
 <body>
 
-    <!-- Main Navigation Header -->
     <header>
         <div class="flex items-center gap-3">
             <button id="btnToggleSidebar" class="icon-only" aria-label="Toggle Sidebar" style="display: none;">
@@ -817,24 +800,17 @@
         </div>
     </header>
 
-    <!-- Application Body -->
     <div class="app-body">
-        <!-- Backdrop for mobile drawer -->
         <div id="drawerBackdrop" class="drawer-backdrop"></div>
 
-        <!-- Sidebar Navigation -->
         <aside id="sidebar">
             <div class="sidebar-search">
                 <input type="search" id="toolSearch" placeholder="Search developer tools..." autocomplete="off">
             </div>
-            <div class="sidebar-menu" id="toolMenu">
-                <!-- Populated via JavaScript -->
-            </div>
+            <div class="sidebar-menu" id="toolMenu"></div>
         </aside>
 
-        <!-- Main Workspace -->
         <main>
-            <!-- Action Toolbar -->
             <div class="action-toolbar">
                 <div class="tool-heading">
                     <div>
@@ -882,7 +858,6 @@
                 </div>
             </div>
 
-            <!-- Collapsible Live Tool Documentation Drawer -->
             <div id="toolSpecDrawer" class="tool-spec-drawer">
                 <div class="spec-card">
                     <div class="spec-card-title">Algorithmic Mechanism</div>
@@ -898,9 +873,7 @@
                 </div>
             </div>
 
-            <!-- Split Panel Workspace -->
             <div class="split-workspace">
-                <!-- Input Panel -->
                 <div class="pane">
                     <div class="pane-topbar">
                         <div class="pane-label">
@@ -926,7 +899,6 @@
                     </div>
                 </div>
 
-                <!-- Output Panel -->
                 <div class="pane">
                     <div class="pane-topbar">
                         <div class="pane-label">
@@ -954,7 +926,6 @@
         </main>
     </div>
 
-    <!-- Documentation & FAQ Knowledge Base Modal -->
     <div class="modal-overlay" id="docsModal">
         <div class="modal-box large">
             <div class="modal-header">
@@ -988,7 +959,7 @@
                             <svg class="faq-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
                         </div>
                         <div class="faq-answer">
-                            Standard title casing blindly capitalizes every word. DevSuite's Smart Propercase algorithm follows established editorial style guides (Chicago / AP style): short prepositions, articles, and conjunctions (e.g., <em>of, in, at, on, to, for, and, but, the, a, an</em>) remain lowercase unless they appear at the start or end of a title or after sentence-ending punctuation.
+                            Standard title casing blindly capitalizes every word. DevSuite's Smart Propercase algorithm follows established editorial style guides (Chicago / AP style): short prepositions, articles, and conjunctions remain lowercase unless they appear at the start or end of a title or after sentence-ending punctuation.
                         </div>
                     </div>
 
@@ -1032,7 +1003,6 @@
         </div>
     </div>
 
-    <!-- Theme & Customization Studio Modal -->
     <div class="modal-overlay" id="studioModal">
         <div class="modal-box">
             <div class="modal-header">
@@ -1120,7 +1090,6 @@
         </div>
     </div>
 
-    <!-- Notification Toast Anchor -->
     <div class="toast-holder" id="toastHolder"></div>
 
     <script>
@@ -1345,7 +1314,6 @@
                         .replace(/;\s*/g, ';\n' + innerPad)
                         .replace(/\s*\}\s*/g, '\n' + pad + '}\n\n')
                         .replace(/\s*,\s*/g, ', ')
-                        .replace(new RegExp('\n' + innerPad.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '$'), '')
                         .trim();
                 },
                 minify: (css) => {
@@ -1362,18 +1330,20 @@
                 format: (html, baseIndent = 0) => {
                     const subBlocks = [];
 
-                    // 1. Isolate and format inline <style> elements
-                    let processed = html.replace(/<style\b([^>]*)>([\s\S]*?)<\/style>/gi, (match, attrs, content) => {
+                    // 1. Isolate <style> using split strings to prevent premature tag closing
+                    const styleRegex = new RegExp('<style\\b([^>]*)>([\\s\\S]*?)<\\/style>', 'gi');
+                    let processed = html.replace(styleRegex, (match, attrs, content) => {
                         const marker = `___CSS_BLOCK_${subBlocks.length}___`;
                         subBlocks.push({
                             type: 'css',
                             formatted: CodeProcessors.css.format(content, 0)
                         });
-                        return `<style${attrs}>\n${marker}\n</style>`;
+                        return '<style' + attrs + '>\n' + marker + '\n<' + '/style>';
                     });
 
-                    // 2. Isolate and format inline <script> elements (excluding LD-JSON & raw templates)
-                    processed = processed.replace(/<script\b([^>]*)>([\s\S]*?)<\/script>/gi, (match, attrs, content) => {
+                    // 2. Isolate <script> safely using split strings
+                    const scriptRegex = new RegExp('<script\\b([^>]*)>([\\s\\S]*?)<\\/script>', 'gi');
+                    processed = processed.replace(scriptRegex, (match, attrs, content) => {
                         if (/type\s*=\s*["'](?!text\/javascript|application\/javascript)[^"']+["']/i.test(attrs)) {
                             return match;
                         }
@@ -1382,7 +1352,7 @@
                             type: 'js',
                             formatted: CodeProcessors.javascript.format(content, 0)
                         });
-                        return `<script${attrs}>\n${marker}\n</script>`;
+                        return '<script' + attrs + '>\n' + marker + '\n<' + '/script>';
                     });
 
                     // 3. Format primary HTML tree structure
@@ -1408,13 +1378,14 @@
                         }
                     });
 
-                    // 4. Re-inject formatted embedded JS and CSS with relative tree indentation
+                    // 4. Re-inject formatted embedded JS and CSS using safe functional replacers
                     subBlocks.forEach((block, idx) => {
-                        const regex = new RegExp(`^(\\s*)___(?:CSS|JS)_BLOCK_${idx}___`, 'm');
+                        const marker = `___${block.type.toUpperCase()}_BLOCK_${idx}___`;
+                        const regex = new RegExp(`^(\\s*)${marker}`, 'm');
                         const match = formatted.match(regex);
                         const tagIndent = match ? match[1].length : 4;
                         const indented = CodeProcessors.indentLines(block.formatted, tagIndent);
-                        formatted = formatted.replace(new RegExp(`___(?:CSS|JS)_BLOCK_${idx}___`), indented);
+                        formatted = formatted.replace(new RegExp(`^\\s*${marker}`, 'm'), () => indented);
                     });
 
                     return formatted.trim();
@@ -1433,7 +1404,6 @@
                     const hasPhp = /<\?(?:php|=)?[\s\S]*?\?>/i.test(php);
                     const hasHtml = /<[a-z][\s\S]*>/i.test(php);
 
-                    // Multi-layer nested parsing: PHP document interleaving HTML, CSS, and JS
                     if (hasPhp && hasHtml) {
                         const phpBlocks = [];
                         const masked = php.replace(/(<\?(?:php|=)?[\s\S]*?\?>)/gi, (match) => {
@@ -1444,16 +1414,14 @@
 
                         let formattedHTML = CodeProcessors.html.format(masked);
 
-                        // Re-inject PHP tags with clean internal spacing
                         phpBlocks.forEach((block, i) => {
                             const cleaned = block.replace(/\s+/g, ' ').replace(/\s*\?>/, ' ?>');
-                            formattedHTML = formattedHTML.replace(new RegExp(`___PHP_TOKEN_${i}___`, 'g'), cleaned);
+                            formattedHTML = formattedHTML.replace(new RegExp(`___PHP_TOKEN_${i}___`, 'g'), () => cleaned);
                         });
 
                         return formattedHTML;
                     }
 
-                    // Pure PHP formatting
                     return php
                         .replace(/\s+/g, ' ')
                         .replace(/\{/g, ' {\n    ')
@@ -1499,15 +1467,14 @@
          * Global Tools Registry & Educational Specs
          */
         const ToolsRegistry = {
-            // --- Code Formatters ---
             'code-fmt': {
                 name: 'Code Formatter',
                 category: 'Code Tools',
                 desc: 'Intelligent multi-language formatter for JS, HTML, CSS, PHP, or SQL with auto-detection.',
-                sample: '<?php if ($userAuthenticated) { ?>\n<div class="user-card"><style>body{background-color:#0b1120;color:#fff;}.user-card{padding:1rem;border:1px solid #334155;}</style><h1>Welcome, <?= $username; ?></h1><script>function recordEntry(id){const payload={id:id,time:Date.now()};console.log("Logged:",payload);}recordEntry(42);<\/script></div>\n<?php } ?>',
+                sample: '<?php if ($userAuthenticated) { ?>\n<div class="user-card">\n    <style>body { background: #0b1120; color: #fff; } .user-card { padding: 1rem; border: 1px solid #334155; }</style>\n    <h1>Welcome, <?= $username; ?></h1>\n    \x3cscript\x3efunction recordEntry(id) { const payload = { id: id, time: Date.now() }; console.log("Logged:", payload); } recordEntry(42);\x3c/script\x3e\n</div>\n<?php } ?>',
                 showLang: true,
                 canSwap: true,
-                mechanism: 'Recursive lexical tokenizer isolating nested CSS in <style> and JS in <script> blocks, formatting sub-trees, and re-nesting them with accurate contextual indentation.',
+                mechanism: 'Recursive lexical tokenizer isolating nested CSS in style tags and JS in script tags, formatting sub-trees, and re-nesting them with accurate contextual indentation.',
                 compliance: 'HTML5 Living Standard / ECMAScript 2026 / PSR Clean Code Principles',
                 security: '100% offline client-side parser. Never executes scripts or transmits code over network.',
                 run: (input, opts) => {
@@ -1530,8 +1497,6 @@
                     return CodeProcessors[lang].minify(input);
                 }
             },
-
-            // --- Text Case Converters ---
             'case-proper': {
                 name: 'Smart Propercase',
                 category: 'Text Transformers',
@@ -1576,8 +1541,6 @@
                 security: 'Client-side processing.',
                 run: (input) => toSentenceCase(input)
             },
-
-            // --- Encoders & Decoders ---
             'b64-enc': {
                 name: 'Base64 Encoder',
                 category: 'Encoders & Decoders',
@@ -1647,8 +1610,6 @@
                     return doc.documentElement.textContent || '';
                 }
             },
-
-            // --- JSON Tools ---
             'json-fmt': {
                 name: 'JSON Beautifier',
                 category: 'JSON Tools',
@@ -1674,8 +1635,6 @@
                 security: 'Reduces network payload sizes in REST/GraphQL responses.',
                 run: (input) => JSON.stringify(JSON.parse(input))
             },
-
-            // --- Cryptography & Hashes ---
             'hash-inspect': {
                 name: 'All Hashes Generator',
                 category: 'Cryptography',
@@ -1854,7 +1813,6 @@
             showSpecs: localStorage.getItem('devsuite_show_specs') === 'true'
         };
 
-        // UI Element References
         const UI = {
             sidebar: document.getElementById('sidebar'),
             drawerBackdrop: document.getElementById('drawerBackdrop'),
@@ -1899,13 +1857,12 @@
             toastHolder: document.getElementById('toastHolder')
         };
 
-        // Toast Feedback System
         function triggerToast(message, type = 'success') {
             const toast = document.createElement('div');
             toast.className = `toast ${type}`;
             const iconSvg = type === 'success'
                 ? `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg>`
-                : `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>`;
+                : `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>`;
 
             toast.innerHTML = `${iconSvg} <span>${message}</span>`;
             UI.toastHolder.appendChild(toast);
@@ -1943,7 +1900,6 @@
             });
         }
 
-        // Build Sidebar Navigation
         function renderSidebar(searchQuery = '') {
             const categories = {};
             for (const [id, tool] of Object.entries(ToolsRegistry)) {
@@ -1988,7 +1944,6 @@
             });
         }
 
-        // Switch Active Tool
         function switchTool(toolId) {
             if (!ToolsRegistry[toolId]) toolId = 'code-fmt';
             State.activeTool = toolId;
@@ -1998,33 +1953,24 @@
             UI.activeToolName.textContent = tool.name;
             UI.activeToolDesc.textContent = tool.desc;
 
-            // Update Technical Specs Drawer
             UI.specMechanism.textContent = tool.mechanism || 'Client-side processing';
             UI.specCompliance.textContent = tool.compliance || 'W3C Standard';
             UI.specSecurity.textContent = tool.security || 'Local sandbox execution';
 
-            // Configure Control Visibility
             UI.codeLangSelect.classList.toggle('hidden', !tool.showLang);
             UI.jsonIndentSelect.classList.toggle('hidden', !tool.showIndent);
             UI.btnSwap.classList.toggle('hidden', !tool.canSwap);
 
-            // Restore Draft
             UI.inputEditor.value = State.drafts[toolId] || '';
-
-            // Update Menu Highlight
             renderSidebar(UI.toolSearch.value);
-
-            // Execute Live Processing
             processActiveTool();
         }
 
-        // Live Processing Core
         let processDebounce = null;
         async function processActiveTool() {
             const tool = ToolsRegistry[State.activeTool];
             const inputVal = UI.inputEditor.value;
 
-            // Update Input Stats
             updateInputStats(inputVal);
 
             if (!inputVal) {
@@ -2085,7 +2031,6 @@
             }, 120);
         }
 
-        // Stats Calculators
         function updateInputStats(text) {
             const chars = text.length;
             const words = text.trim() ? text.trim().split(/\s+/).length : 0;
@@ -2114,13 +2059,9 @@
             return (bytes / 1048576).toFixed(2) + ' MB';
         }
 
-        /**
-         * Event Listeners & Interactive Handlers
-         */
         function setupEventListeners() {
             UI.inputEditor.addEventListener('input', triggerDebouncedProcess);
 
-            // Mobile Navigation Toggle
             function checkWindowSize() {
                 if (window.innerWidth <= 900) {
                     UI.btnToggleSidebar.style.display = 'inline-flex';
@@ -2143,12 +2084,10 @@
                 UI.drawerBackdrop.classList.remove('active');
             });
 
-            // Sidebar Search
             UI.toolSearch.addEventListener('input', (e) => {
                 renderSidebar(e.target.value);
             });
 
-            // Toolbar Actions
             UI.btnClearInput.addEventListener('click', () => {
                 UI.inputEditor.value = '';
                 triggerDebouncedProcess();
@@ -2175,7 +2114,6 @@
                 triggerToast('Swapped output into input');
             });
 
-            // Toggle Tech Specs
             UI.btnToggleSpecs.addEventListener('click', () => {
                 State.showSpecs = !State.showSpecs;
                 localStorage.setItem('devsuite_show_specs', State.showSpecs);
@@ -2186,7 +2124,6 @@
                 UI.toolSpecDrawer.classList.add('open');
             }
 
-            // Clipboard Operations
             function copyTextToClipboard(text, targetEl, successMessage) {
                 if (!text) {
                     triggerToast('Nothing to copy', 'warning');
@@ -2224,7 +2161,6 @@
                 copyTextToClipboard(val, UI.outputEditor, 'Copied output to clipboard!');
             });
 
-            // Language & Indent Selectors
             UI.codeLangSelect.addEventListener('change', (e) => {
                 State.selectedLang = e.target.value;
                 localStorage.setItem('devsuite_code_lang', e.target.value);
@@ -2237,7 +2173,6 @@
                 processActiveTool();
             });
 
-            // Documentation & FAQ Modal
             UI.btnOpenDocs.addEventListener('click', () => UI.docsModal.classList.add('active'));
             UI.btnCloseDocs.addEventListener('click', () => UI.docsModal.classList.remove('active'));
             UI.btnDoneDocs.addEventListener('click', () => UI.docsModal.classList.remove('active'));
@@ -2265,7 +2200,6 @@
                 });
             });
 
-            // Theme Studio
             UI.btnOpenStudio.addEventListener('click', () => UI.studioModal.classList.add('active'));
             UI.btnCloseStudio.addEventListener('click', () => UI.studioModal.classList.remove('active'));
             UI.btnDoneStudio.addEventListener('click', () => UI.studioModal.classList.remove('active'));
@@ -2316,7 +2250,6 @@
             });
         }
 
-        // Initialize Application
         function initApp() {
             if (Object.keys(State.customColors).length > 0) {
                 applyTheme(State.activeTheme, State.customColors);
@@ -2332,7 +2265,6 @@
             switchTool(State.activeTool);
         }
 
-        // Boot
         window.addEventListener('DOMContentLoaded', initApp);
     </script>
 </body>
