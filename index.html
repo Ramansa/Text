@@ -7,8 +7,8 @@
     
     <!-- Primary SEO Meta Tags -->
     <meta name="title" content="DevSuite | Professional Offline Developer Utilities & Security Suite">
-    <meta name="description" content="All-in-one privacy-first developer utility suite: UTF-8 Base64, URL encoder, JSON formatter, Multi-language code minifier, JWT inspector, HTML entities, Text Case Converter (Smart Propercase, Uppercase, Lowercase), and MD5/SHA cryptographic hash generators. 100% offline and client-side.">
-    <meta name="keywords" content="developer tools, proper case converter, smart title case, uppercase converter, lowercase converter, base64 encoder utf-8, jwt decoder, json beautifier, code minifier, md5 hash generator, sha256 generator, url encoder, offline devsuite, formatting tools, privacy developer utilities">
+    <meta name="description" content="All-in-one privacy-first developer utility suite: UTF-8 Base64, URL encoder, JSON formatter, Multi-language code formatter and minifier (HTML, CSS, JS, PHP, SQL), JWT inspector, HTML entities, Text Case Converter, and cryptographic hash generators. 100% offline and client-side.">
+    <meta name="keywords" content="developer tools, code formatter, multi language formatter, php html formatter, proper case converter, smart title case, uppercase converter, lowercase converter, base64 encoder utf-8, jwt decoder, json beautifier, code minifier, md5 hash generator, sha256 generator, url encoder, offline devsuite">
     <meta name="author" content="DevSuite Open Platform">
     <meta name="robots" content="index, follow">
     <meta name="theme-color" content="#0b1120">
@@ -40,7 +40,7 @@
             "price": "0",
             "priceCurrency": "USD"
           },
-          "description": "Privacy-focused developer utilities including Base64 UTF-8 safe encode/decode, Smart Propercase/Title Case converter, JWT payload inspector, code formatters, and cryptographic hash generators."
+          "description": "Privacy-focused developer utilities including Base64 UTF-8 safe encode/decode, Smart Propercase/Title Case converter, JWT payload inspector, multi-language code formatters, and cryptographic hash generators."
         },
         {
           "@type": "FAQPage",
@@ -55,10 +55,18 @@
             },
             {
               "@type": "Question",
+              "name": "How does the Multi-Language Code Formatter handle nested code?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "The formatter tokenizes and isolates embedded code blocks such as PHP tags, CSS in style tags, and JS in script tags. Each layer is formatted with its specialized syntax engine and then re-nested within the parent document structure with aligned indentation."
+              }
+            },
+            {
+              "@type": "Question",
               "name": "How does Smart Propercase handle minor English words like 'of', 'in', or 'the'?",
               "acceptedAnswer": {
                 "@type": "Answer",
-                "text": "Our smart title/proper case algorithm follows standard English editorial style rules (Chicago Manual of Style / AP). It keeps articles, short prepositions, and coordinating conjunctions (such as 'of', 'in', 'on', 'and', 'the', 'for') in lowercase, while ensuring the first and last words of sentences and titles are always properly capitalized."
+                "text": "Our smart title/proper case algorithm follows standard English editorial style rules (Chicago Manual of Style / AP). It keeps articles, short prepositions, and coordinating conjunctions in lowercase, while ensuring the first and last words of sentences and titles are always capitalized."
               }
             },
             {
@@ -67,14 +75,6 @@
               "acceptedAnswer": {
                 "@type": "Answer",
                 "text": "Standard browser btoa/atob routines only support Latin1 (ASCII). DevSuite uses modern TextEncoder and TextDecoder binary byte streaming to ensure multi-byte symbols, East Asian typography, and emojis are converted without mojibake or corrupt byte errors."
-              }
-            },
-            {
-              "@type": "Question",
-              "name": "Can DevSuite verify JWT signatures?",
-              "acceptedAnswer": {
-                "@type": "Answer",
-                "text": "The JWT tool inspects and decodes the Header and Payload claims and parses human-readable expiration dates. Cryptographic signature verification requires a shared secret or public RSA key and is intentionally omitted for client-side privacy."
               }
             },
             {
@@ -521,7 +521,7 @@
             color: var(--danger) !important;
         }
 
-        /* Modals (Theme Studio & FAQ Knowledge Base) */
+        /* Modals */
         .modal-overlay {
             position: fixed;
             inset: 0;
@@ -839,22 +839,23 @@
                 <div class="tool-heading">
                     <div>
                         <div class="flex items-center gap-2">
-                            <span class="tool-title" id="activeToolName">Base64 Encoder</span>
+                            <span class="tool-title" id="activeToolName">Code Formatter</span>
                             <button id="btnToggleSpecs" class="text-xs py-1 px-2" title="Toggle technical specifications and documentation">
                                 <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
                                 Tool Specs
                             </button>
                         </div>
-                        <div class="tool-desc" id="activeToolDesc">Convert raw UTF-8 string into standard Base64 format</div>
+                        <div class="tool-desc" id="activeToolDesc">Format JS, HTML (with CSS/JS), PHP (with HTML/CSS/JS), CSS, or SQL with auto-detection.</div>
                     </div>
                 </div>
 
                 <div class="flex items-center gap-2" id="toolControls">
                     <select id="codeLangSelect" class="hidden">
+                        <option value="auto" selected>Auto Detect</option>
                         <option value="javascript">JavaScript</option>
-                        <option value="html">HTML</option>
+                        <option value="html">HTML (with CSS/JS)</option>
+                        <option value="php">PHP (with HTML/CSS/JS)</option>
                         <option value="css">CSS</option>
-                        <option value="php">PHP</option>
                         <option value="sql">SQL</option>
                     </select>
                     
@@ -921,7 +922,7 @@
                             <span id="inLines">0 lines</span>
                             <span id="inBytes">0 B</span>
                         </div>
-                        <span>Live Sync</span>
+                        <span id="detectedLangBadge">Live Sync</span>
                     </div>
                 </div>
 
@@ -971,65 +972,60 @@
                 </div>
 
                 <div id="faqList">
-                    <!-- FAQ 1 -->
                     <div class="faq-item open">
+                        <div class="faq-question">
+                            <span>How does Multi-Language Code Formatting work?</span>
+                            <svg class="faq-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                        </div>
+                        <div class="faq-answer">
+                            DevSuite features a multi-tiered recursive tokenizer. When a document contains multiple embedded languages (e.g. PHP containing HTML, or HTML containing internal &lt;style&gt; CSS and &lt;script&gt; JavaScript), the sub-languages are isolated and parsed with their dedicated formatting algorithms. They are then re-injected with proper hierarchical indentation aligned to the outer document.
+                        </div>
+                    </div>
+
+                    <div class="faq-item">
                         <div class="faq-question">
                             <span>How does the Smart Propercase / Title Case tool work?</span>
                             <svg class="faq-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
                         </div>
                         <div class="faq-answer">
-                            Standard naive title casing capitalizes every word blindly (e.g. <em>"The Lord Of The Rings"</em>). DevSuite's Smart Propercase algorithm follows established editorial style guides (Chicago / AP style): short prepositions, articles, and conjunctions (e.g., <em>of, in, at, on, to, for, and, but, the, a, an</em>) remain lowercase unless they appear at the start or end of a title or after sentence-ending punctuation. Hyphenated compound words are also parsed with precision.
+                            Standard title casing blindly capitalizes every word. DevSuite's Smart Propercase algorithm follows established editorial style guides (Chicago / AP style): short prepositions, articles, and conjunctions (e.g., <em>of, in, at, on, to, for, and, but, the, a, an</em>) remain lowercase unless they appear at the start or end of a title or after sentence-ending punctuation.
                         </div>
                     </div>
 
-                    <!-- FAQ 2 -->
                     <div class="faq-item">
                         <div class="faq-question">
                             <span>How is data privacy guaranteed on DevSuite?</span>
                             <svg class="faq-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
                         </div>
                         <div class="faq-answer">
-                            DevSuite is completely offline and serverless. All encoding, decoding, JSON formatting, token inspecting, text casing, and cryptographic hashing operations execute exclusively inside your browser using native JavaScript and the W3C Web Cryptography API. No payload or user input is ever sent over the network.
+                            DevSuite is completely offline and serverless. All operations run exclusively inside your local browser using client-side JavaScript and the Web Cryptography API. Zero bytes of code, hashes, or tokens are ever sent over the network.
                         </div>
                     </div>
 
-                    <!-- FAQ 3 -->
                     <div class="faq-item">
                         <div class="faq-question">
                             <span>Why doesn't standard Base64 handle emojis without corrupting?</span>
                             <svg class="faq-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
                         </div>
                         <div class="faq-answer">
-                            Legacy browser methods (<code>btoa</code> and <code>atob</code>) only support 8-bit Latin1 character codepoints. When handling multi-byte Unicode strings (e.g. emojis, symbols, Cyrillic, or Asian characters), standard <code>btoa</code> throws a <code>DOMException</code>. DevSuite uses modern <code>TextEncoder</code> byte streaming and <code>Uint8Array</code> buffers to safely convert full multi-byte UTF-8 sequences without data loss or mojibake.
+                            Legacy browser methods (<code>btoa</code> and <code>atob</code>) only support 8-bit Latin1 character codepoints. When handling multi-byte Unicode strings (e.g. emojis or Asian typography), standard <code>btoa</code> throws an error. DevSuite uses modern <code>TextEncoder</code> byte streaming and <code>Uint8Array</code> buffers to safely convert multi-byte UTF-8 sequences.
                         </div>
                     </div>
 
-                    <!-- FAQ 4 -->
-                    <div class="faq-item">
-                        <div class="faq-question">
-                            <span>How does the JWT (JSON Web Token) Decoder work?</span>
-                            <svg class="faq-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
-                        </div>
-                        <div class="faq-answer">
-                            A JSON Web Token consists of three base64url-encoded components separated by dots: Header, Payload, and Signature. DevSuite splits these segments, decodes the URI-safe base64 payload into formatted JSON, and parses standard Unix timestamps (<code>exp</code>, <code>iat</code>, <code>nbf</code>) into human-readable UTC dates with automatic expiration badges.
-                        </div>
-                    </div>
-
-                    <!-- FAQ 5 -->
                     <div class="faq-item">
                         <div class="faq-question">
                             <span>When should I use MD5 vs SHA-256 or SHA-512?</span>
                             <svg class="faq-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
                         </div>
                         <div class="faq-answer">
-                            <strong>MD5 & SHA-1:</strong> Cryptographically broken and susceptible to hash collisions. Only use them for legacy checksums, non-cryptographic deduplication, or cache keys.<br>
-                            <strong>SHA-256 & SHA-512:</strong> Cryptographically secure NIST-approved standards recommended for digital signatures, blockchain blocks, and data integrity verification.
+                            <strong>MD5 & SHA-1:</strong> Cryptographically broken due to collision vulnerabilities. Suitable only for non-security checksums and deduplication.<br>
+                            <strong>SHA-256 & SHA-512:</strong> Cryptographically secure NIST-approved standards recommended for data integrity, authentication tokens, and signatures.
                         </div>
                     </div>
                 </div>
 
                 <div class="mt-4 flex justify-between items-center">
-                    <span class="text-xs opacity-60">DevSuite v2.7 • Privacy-First Architecture</span>
+                    <span class="text-xs opacity-60">DevSuite v2.8 • Offline Multi-Language Architecture</span>
                     <button id="btnDoneDocs" class="primary text-sm">Close Guide</button>
                 </div>
             </div>
@@ -1234,8 +1230,6 @@
         // 4. Smart English Propercase / Title Case Algorithm
         function toSmartProperCase(str) {
             if (!str) return '';
-
-            // Set of standard English minor words that remain lowercase in titles
             const minorWords = new Set([
                 'a', 'an', 'the',
                 'and', 'but', 'or', 'for', 'nor', 'so', 'yet',
@@ -1244,21 +1238,16 @@
 
             return str.replace(/\b([A-Za-z0-9]+(?:'[A-Za-z0-9]+)?|-)\b/g, (match, word, offset, fullString) => {
                 if (word === '-') return word;
-
                 const lowerWord = word.toLowerCase();
-
                 const precedingSlice = fullString.slice(0, offset).trim();
                 const isStart = precedingSlice.length === 0 || /[.!?:\n]\s*$/.test(fullString.slice(0, offset));
-
                 const followingSlice = fullString.slice(offset + match.length).trim();
                 const isEnd = followingSlice.length === 0 || /^[.!?:\n]/.test(followingSlice);
 
                 if (word.includes('-')) {
                     return word.split('-').map((subWord, idx) => {
                         const lowerSub = subWord.toLowerCase();
-                        if (idx > 0 && minorWords.has(lowerSub)) {
-                            return lowerSub;
-                        }
+                        if (idx > 0 && minorWords.has(lowerSub)) return lowerSub;
                         return subWord.charAt(0).toUpperCase() + subWord.slice(1).toLowerCase();
                     }).join('-');
                 }
@@ -1266,23 +1255,43 @@
                 if (minorWords.has(lowerWord) && !isStart && !isEnd) {
                     return lowerWord;
                 }
-
                 return word.charAt(0).toUpperCase() + word.slice(1).toLowerCase();
             });
         }
 
-        // Sentence Case helper
         function toSentenceCase(str) {
             return str.toLowerCase().replace(/(^\s*|[.!?]\s+|\n\s*)([a-z])/g, (m, sep, char) => {
                 return sep + char.toUpperCase();
             });
         }
 
-        // 5. Standalone Multi-Language Code Formatter & Minifier
+        // 5. Intelligent Multi-Language Syntax Heuristics
+        function detectMultiLanguage(code) {
+            const text = code.trim();
+            if (!text) return 'javascript';
+            if (/<\?(php|=)/i.test(text)) return 'php';
+            if (/<!DOCTYPE\s+html/i.test(text) || /<(html|head|body|div|p|span|script|style|table|nav|header|footer|section|article)\b/i.test(text)) {
+                return 'html';
+            }
+            if (/^\s*(SELECT|INSERT\s+INTO|UPDATE|DELETE\s+FROM|CREATE\s+TABLE|ALTER\s+TABLE)\b/i.test(text)) {
+                return 'sql';
+            }
+            if (/@(media|keyframes|import|charset)\b|([.#][\w-]+\s*\{[^}]*\})/i.test(text) && !text.includes('function')) {
+                return 'css';
+            }
+            return 'javascript';
+        }
+
+        // 6. Deep Multi-Language Recursive Code Processors
         const CodeProcessors = {
+            indentLines: (str, spaces) => {
+                const pad = ' '.repeat(spaces);
+                return str.split('\n').map(line => line.trim() ? pad + line : '').join('\n');
+            },
+
             javascript: {
-                format: (code) => {
-                    let indent = 0;
+                format: (code, baseIndent = 0) => {
+                    let indent = baseIndent;
                     const lines = [];
                     let token = '';
                     let inString = null;
@@ -1290,7 +1299,6 @@
                     const clean = code.replace(/\r\n/g, '\n').trim();
                     for (let i = 0; i < clean.length; i++) {
                         const char = clean[i];
-
                         if (!inString && (char === '"' || char === "'" || char === '`')) {
                             inString = char;
                             token += char;
@@ -1300,11 +1308,11 @@
                         } else if (!inString && char === '{') {
                             token += ' {\n';
                             indent += 4;
-                            lines.push(' '.repeat(Math.max(0, indent - 4)) + token.trim());
+                            lines.push(' '.repeat(Math.max(baseIndent, indent - 4)) + token.trim());
                             token = '';
                         } else if (!inString && char === '}') {
                             if (token.trim()) lines.push(' '.repeat(indent) + token.trim());
-                            indent = Math.max(0, indent - 4);
+                            indent = Math.max(baseIndent, indent - 4);
                             token = '';
                             lines.push(' '.repeat(indent) + '}');
                         } else if (!inString && char === ';') {
@@ -1326,38 +1334,18 @@
                         .trim();
                 }
             },
-            html: {
-                format: (html) => {
-                    let formatted = '';
-                    let indent = 0;
-                    const tokens = html.replace(/>\s*</g, '><').replace(/</g, '\n<').split('\n').filter(Boolean);
-                    tokens.forEach(tok => {
-                        if (tok.match(/^<\/\w/)) {
-                            indent = Math.max(0, indent - 4);
-                        }
-                        formatted += ' '.repeat(indent) + tok.trim() + '\n';
-                        if (tok.match(/^<[^/?!][^>]*[^\/]>/) && !tok.match(/<input|<img|<br|<hr|<meta|<link/i)) {
-                            indent += 4;
-                        }
-                    });
-                    return formatted.trim();
-                },
-                minify: (html) => {
-                    return html
-                        .replace(/<!--[\s\S]*?-->/g, '')
-                        .replace(/>\s+</g, '><')
-                        .replace(/\s+/g, ' ')
-                        .trim();
-                }
-            },
+
             css: {
-                format: (css) => {
+                format: (css, baseIndent = 0) => {
+                    const pad = ' '.repeat(baseIndent);
+                    const innerPad = ' '.repeat(baseIndent + 4);
                     return css
                         .replace(/\s+/g, ' ')
-                        .replace(/\{\s*/g, ' {\n    ')
-                        .replace(/;\s*/g, ';\n    ')
-                        .replace(/\s*\}\s*/g, '\n}\n\n')
+                        .replace(/\{\s*/g, ' {\n' + innerPad)
+                        .replace(/;\s*/g, ';\n' + innerPad)
+                        .replace(/\s*\}\s*/g, '\n' + pad + '}\n\n')
                         .replace(/\s*,\s*/g, ', ')
+                        .replace(new RegExp('\n' + innerPad.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '$'), '')
                         .trim();
                 },
                 minify: (css) => {
@@ -1369,8 +1357,103 @@
                         .trim();
                 }
             },
+
+            html: {
+                format: (html, baseIndent = 0) => {
+                    const subBlocks = [];
+
+                    // 1. Isolate and format inline <style> elements
+                    let processed = html.replace(/<style\b([^>]*)>([\s\S]*?)<\/style>/gi, (match, attrs, content) => {
+                        const marker = `___CSS_BLOCK_${subBlocks.length}___`;
+                        subBlocks.push({
+                            type: 'css',
+                            formatted: CodeProcessors.css.format(content, 0)
+                        });
+                        return `<style${attrs}>\n${marker}\n</style>`;
+                    });
+
+                    // 2. Isolate and format inline <script> elements (excluding LD-JSON & raw templates)
+                    processed = processed.replace(/<script\b([^>]*)>([\s\S]*?)<\/script>/gi, (match, attrs, content) => {
+                        if (/type\s*=\s*["'](?!text\/javascript|application\/javascript)[^"']+["']/i.test(attrs)) {
+                            return match;
+                        }
+                        const marker = `___JS_BLOCK_${subBlocks.length}___`;
+                        subBlocks.push({
+                            type: 'js',
+                            formatted: CodeProcessors.javascript.format(content, 0)
+                        });
+                        return `<script${attrs}>\n${marker}\n</script>`;
+                    });
+
+                    // 3. Format primary HTML tree structure
+                    let formatted = '';
+                    let indent = baseIndent;
+                    const tokens = processed
+                        .replace(/>\s*</g, '><')
+                        .replace(/</g, '\n<')
+                        .split('\n')
+                        .filter(Boolean);
+
+                    tokens.forEach(tok => {
+                        const trimmed = tok.trim();
+                        if (!trimmed) return;
+                        if (trimmed.match(/^<\/\w/)) {
+                            indent = Math.max(baseIndent, indent - 4);
+                        }
+                        formatted += ' '.repeat(indent) + trimmed + '\n';
+                        const isOpeningTag = trimmed.match(/^<[^/?!][^>]*[^\/]>/);
+                        const isVoid = trimmed.match(/<(?:area|base|br|col|embed|hr|img|input|link|meta|param|source|track|wbr)/i);
+                        if (isOpeningTag && !isVoid) {
+                            indent += 4;
+                        }
+                    });
+
+                    // 4. Re-inject formatted embedded JS and CSS with relative tree indentation
+                    subBlocks.forEach((block, idx) => {
+                        const regex = new RegExp(`^(\\s*)___(?:CSS|JS)_BLOCK_${idx}___`, 'm');
+                        const match = formatted.match(regex);
+                        const tagIndent = match ? match[1].length : 4;
+                        const indented = CodeProcessors.indentLines(block.formatted, tagIndent);
+                        formatted = formatted.replace(new RegExp(`___(?:CSS|JS)_BLOCK_${idx}___`), indented);
+                    });
+
+                    return formatted.trim();
+                },
+                minify: (html) => {
+                    return html
+                        .replace(/<!--[\s\S]*?-->/g, '')
+                        .replace(/>\s+</g, '><')
+                        .replace(/\s+/g, ' ')
+                        .trim();
+                }
+            },
+
             php: {
                 format: (php) => {
+                    const hasPhp = /<\?(?:php|=)?[\s\S]*?\?>/i.test(php);
+                    const hasHtml = /<[a-z][\s\S]*>/i.test(php);
+
+                    // Multi-layer nested parsing: PHP document interleaving HTML, CSS, and JS
+                    if (hasPhp && hasHtml) {
+                        const phpBlocks = [];
+                        const masked = php.replace(/(<\?(?:php|=)?[\s\S]*?\?>)/gi, (match) => {
+                            const token = `___PHP_TOKEN_${phpBlocks.length}___`;
+                            phpBlocks.push(match);
+                            return token;
+                        });
+
+                        let formattedHTML = CodeProcessors.html.format(masked);
+
+                        // Re-inject PHP tags with clean internal spacing
+                        phpBlocks.forEach((block, i) => {
+                            const cleaned = block.replace(/\s+/g, ' ').replace(/\s*\?>/, ' ?>');
+                            formattedHTML = formattedHTML.replace(new RegExp(`___PHP_TOKEN_${i}___`, 'g'), cleaned);
+                        });
+
+                        return formattedHTML;
+                    }
+
+                    // Pure PHP formatting
                     return php
                         .replace(/\s+/g, ' ')
                         .replace(/\{/g, ' {\n    ')
@@ -1387,6 +1470,7 @@
                         .trim();
                 }
             },
+
             sql: {
                 format: (sql) => {
                     const keywords = [
@@ -1415,6 +1499,38 @@
          * Global Tools Registry & Educational Specs
          */
         const ToolsRegistry = {
+            // --- Code Formatters ---
+            'code-fmt': {
+                name: 'Code Formatter',
+                category: 'Code Tools',
+                desc: 'Intelligent multi-language formatter for JS, HTML, CSS, PHP, or SQL with auto-detection.',
+                sample: '<?php if ($userAuthenticated) { ?>\n<div class="user-card"><style>body{background-color:#0b1120;color:#fff;}.user-card{padding:1rem;border:1px solid #334155;}</style><h1>Welcome, <?= $username; ?></h1><script>function recordEntry(id){const payload={id:id,time:Date.now()};console.log("Logged:",payload);}recordEntry(42);<\/script></div>\n<?php } ?>',
+                showLang: true,
+                canSwap: true,
+                mechanism: 'Recursive lexical tokenizer isolating nested CSS in <style> and JS in <script> blocks, formatting sub-trees, and re-nesting them with accurate contextual indentation.',
+                compliance: 'HTML5 Living Standard / ECMAScript 2026 / PSR Clean Code Principles',
+                security: '100% offline client-side parser. Never executes scripts or transmits code over network.',
+                run: (input, opts) => {
+                    const lang = (opts.lang === 'auto') ? detectMultiLanguage(input) : opts.lang;
+                    return CodeProcessors[lang].format(input);
+                }
+            },
+            'code-min': {
+                name: 'Code Minifier',
+                category: 'Code Tools',
+                desc: 'Strip comments and minimize whitespace across JS, HTML, CSS, PHP, and SQL.',
+                sample: '/* Multi-line Component Styles */\n.container {\n    background-color: #0b1120;\n    color: #f1f5f9;\n    padding: 10px 15px;\n}\n\n// Inline Comment\nfunction init() {\n    return true;\n}',
+                showLang: true,
+                canSwap: true,
+                mechanism: 'Regex token compression stripping single/multi-line comments and optimizing syntactic spacing.',
+                compliance: 'Standard Asset Minification Guidelines',
+                security: 'Strips proprietary code comments and optimizes client payload weight.',
+                run: (input, opts) => {
+                    const lang = (opts.lang === 'auto') ? detectMultiLanguage(input) : opts.lang;
+                    return CodeProcessors[lang].minify(input);
+                }
+            },
+
             // --- Text Case Converters ---
             'case-proper': {
                 name: 'Smart Propercase',
@@ -1537,7 +1653,7 @@
                 name: 'JSON Beautifier',
                 category: 'JSON Tools',
                 desc: 'Parse, validate, and format JSON with custom indentation spaces.',
-                sample: '{"name":"DevSuite","version":"2.7.0","settings":{"theme":"midnight-blue","offline":true},"features":["base64","jwt","hashes","propercase","formatters"]}',
+                sample: '{"name":"DevSuite","version":"2.8.0","settings":{"theme":"midnight-blue","offline":true},"features":["multi-language-code","base64","jwt","hashes","propercase"]}',
                 showIndent: true,
                 mechanism: 'Validates structure via ECMAScript JSON grammar tree and formats with selected spacing.',
                 compliance: 'ECMA-404 JSON Data Interchange Standard',
@@ -1557,30 +1673,6 @@
                 compliance: 'ECMA-404',
                 security: 'Reduces network payload sizes in REST/GraphQL responses.',
                 run: (input) => JSON.stringify(JSON.parse(input))
-            },
-
-            // --- Code Formatters ---
-            'code-fmt': {
-                name: 'Code Formatter',
-                category: 'Code Tools',
-                desc: 'Format JavaScript, HTML, CSS, PHP, or SQL using native formatters.',
-                sample: 'function calculateSum(a,b){const result=a+b;if(result>100){return "High: "+result;}return "Low: "+result;}',
-                showLang: true,
-                mechanism: 'Performs lexical grammar tokenization and applies standard nesting indentation.',
-                compliance: 'Clean Code formatting conventions',
-                security: 'Formatting executes strictly in client memory without external transpilers.',
-                run: (input, opts) => CodeProcessors[opts.lang].format(input)
-            },
-            'code-min': {
-                name: 'Code Minifier',
-                category: 'Code Tools',
-                desc: 'Strip comments and minimize whitespace for JS, HTML, CSS, PHP, & SQL.',
-                sample: '/* Multi-line Banner */\nbody {\n    background-color: #0b1120;\n    color: #f1f5f9;\n    margin: 0px;\n}',
-                showLang: true,
-                mechanism: 'Regex token scanner that eliminates single/multi-line comments and compresses tokens.',
-                compliance: 'Minification Standards',
-                security: 'Strips proprietary development comments and decreases asset payload weight.',
-                run: (input, opts) => CodeProcessors[opts.lang].minify(input)
             },
 
             // --- Cryptography & Hashes ---
@@ -1625,7 +1717,7 @@
                 isAsync: true,
                 mechanism: 'Hardware-accelerated WebCrypto engine generating 160-bit hash state.',
                 compliance: 'FIPS PUB 180-1 / RFC 3174',
-                security: 'Deprecated for TLS/SSL certificates and digital signatures due to collision weaknesses.',
+                security: 'Deprecated for TLS/SSL certificates due to collision weaknesses.',
                 run: (input) => calculateDigest('SHA-1', input)
             },
             'hash-sha256': {
@@ -1753,11 +1845,11 @@
          * State Controller & Application Initialization
          */
         const State = {
-            activeTool: localStorage.getItem('devsuite_active_tool') || 'case-proper',
+            activeTool: localStorage.getItem('devsuite_active_tool') || 'code-fmt',
             activeTheme: localStorage.getItem('devsuite_active_theme') || 'midnight-blue',
             customColors: JSON.parse(localStorage.getItem('devsuite_custom_colors') || '{}'),
             drafts: JSON.parse(localStorage.getItem('devsuite_tool_drafts') || '{}'),
-            selectedLang: localStorage.getItem('devsuite_code_lang') || 'javascript',
+            selectedLang: localStorage.getItem('devsuite_code_lang') || 'auto',
             selectedIndent: localStorage.getItem('devsuite_json_indent') || '4',
             showSpecs: localStorage.getItem('devsuite_show_specs') === 'true'
         };
@@ -1793,6 +1885,7 @@
             outLines: document.getElementById('outLines'),
             outBytes: document.getElementById('outBytes'),
             engineStatus: document.getElementById('engineStatus'),
+            detectedLangBadge: document.getElementById('detectedLangBadge'),
             docsModal: document.getElementById('docsModal'),
             btnOpenDocs: document.getElementById('btnOpenDocs'),
             btnCloseDocs: document.getElementById('btnCloseDocs'),
@@ -1810,7 +1903,6 @@
         function triggerToast(message, type = 'success') {
             const toast = document.createElement('div');
             toast.className = `toast ${type}`;
-            
             const iconSvg = type === 'success'
                 ? `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg>`
                 : `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>`;
@@ -1826,7 +1918,6 @@
             }, 2600);
         }
 
-        // Color Helper Functions
         function hexToRgb(hex) {
             const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
             return result ? `${parseInt(result[1], 16)}, ${parseInt(result[2], 16)}, ${parseInt(result[3], 16)}` : '56, 189, 248';
@@ -1899,7 +1990,7 @@
 
         // Switch Active Tool
         function switchTool(toolId) {
-            if (!ToolsRegistry[toolId]) toolId = 'case-proper';
+            if (!ToolsRegistry[toolId]) toolId = 'code-fmt';
             State.activeTool = toolId;
             localStorage.setItem('devsuite_active_tool', toolId);
 
@@ -1941,14 +2032,28 @@
                 UI.outputEditor.classList.remove('output-has-error');
                 updateOutputStats('');
                 UI.engineStatus.textContent = 'Ready';
+                UI.detectedLangBadge.textContent = 'Live Sync';
                 return;
             }
 
             UI.engineStatus.textContent = 'Processing...';
 
             try {
+                let currentLang = UI.codeLangSelect.value;
+                if (tool.showLang) {
+                    if (currentLang === 'auto') {
+                        const detected = detectMultiLanguage(inputVal);
+                        UI.detectedLangBadge.textContent = `Auto: ${detected.toUpperCase()}`;
+                        currentLang = detected;
+                    } else {
+                        UI.detectedLangBadge.textContent = `Lang: ${currentLang.toUpperCase()}`;
+                    }
+                } else {
+                    UI.detectedLangBadge.textContent = 'Live Sync';
+                }
+
                 const options = {
-                    lang: UI.codeLangSelect.value,
+                    lang: currentLang,
                     indent: UI.jsonIndentSelect.value
                 };
 
@@ -1974,7 +2079,6 @@
         function triggerDebouncedProcess() {
             clearTimeout(processDebounce);
             processDebounce = setTimeout(() => {
-                // Save draft
                 State.drafts[State.activeTool] = UI.inputEditor.value;
                 localStorage.setItem('devsuite_tool_drafts', JSON.stringify(State.drafts));
                 processActiveTool();
@@ -2014,10 +2118,9 @@
          * Event Listeners & Interactive Handlers
          */
         function setupEventListeners() {
-            // Live Textarea Input
             UI.inputEditor.addEventListener('input', triggerDebouncedProcess);
 
-            // Responsive Mobile Drawer
+            // Mobile Navigation Toggle
             function checkWindowSize() {
                 if (window.innerWidth <= 900) {
                     UI.btnToggleSidebar.style.display = 'inline-flex';
@@ -2040,12 +2143,12 @@
                 UI.drawerBackdrop.classList.remove('active');
             });
 
-            // Search Bar Filter
+            // Sidebar Search
             UI.toolSearch.addEventListener('input', (e) => {
                 renderSidebar(e.target.value);
             });
 
-            // Action Buttons
+            // Toolbar Actions
             UI.btnClearInput.addEventListener('click', () => {
                 UI.inputEditor.value = '';
                 triggerDebouncedProcess();
@@ -2083,7 +2186,7 @@
                 UI.toolSpecDrawer.classList.add('open');
             }
 
-            // Generic Clipboard Copy Function
+            // Clipboard Operations
             function copyTextToClipboard(text, targetEl, successMessage) {
                 if (!text) {
                     triggerToast('Nothing to copy', 'warning');
@@ -2108,12 +2211,10 @@
                 }
             }
 
-            // Clipboard Copy - Source Input
             UI.btnCopyInput.addEventListener('click', () => {
                 copyTextToClipboard(UI.inputEditor.value, UI.inputEditor, 'Copied input to clipboard!');
             });
 
-            // Clipboard Copy - Processed Output
             UI.btnCopyOutput.addEventListener('click', () => {
                 const val = UI.outputEditor.value;
                 if (!val || UI.outputEditor.classList.contains('output-has-error')) {
@@ -2123,7 +2224,7 @@
                 copyTextToClipboard(val, UI.outputEditor, 'Copied output to clipboard!');
             });
 
-            // Options Listeners
+            // Language & Indent Selectors
             UI.codeLangSelect.addEventListener('change', (e) => {
                 State.selectedLang = e.target.value;
                 localStorage.setItem('devsuite_code_lang', e.target.value);
@@ -2136,7 +2237,7 @@
                 processActiveTool();
             });
 
-            // Docs & FAQ Modal
+            // Documentation & FAQ Modal
             UI.btnOpenDocs.addEventListener('click', () => UI.docsModal.classList.add('active'));
             UI.btnCloseDocs.addEventListener('click', () => UI.docsModal.classList.remove('active'));
             UI.btnDoneDocs.addEventListener('click', () => UI.docsModal.classList.remove('active'));
@@ -2144,7 +2245,6 @@
                 if (e.target === UI.docsModal) UI.docsModal.classList.remove('active');
             });
 
-            // FAQ Accordion Handlers
             document.querySelectorAll('.faq-question').forEach(q => {
                 q.addEventListener('click', () => {
                     const item = q.closest('.faq-item');
@@ -2152,7 +2252,6 @@
                 });
             });
 
-            // FAQ Search Filter
             UI.faqSearch.addEventListener('input', (e) => {
                 const term = e.target.value.toLowerCase();
                 document.querySelectorAll('.faq-item').forEach(item => {
@@ -2166,7 +2265,7 @@
                 });
             });
 
-            // Studio Modal
+            // Theme Studio
             UI.btnOpenStudio.addEventListener('click', () => UI.studioModal.classList.add('active'));
             UI.btnCloseStudio.addEventListener('click', () => UI.studioModal.classList.remove('active'));
             UI.btnDoneStudio.addEventListener('click', () => UI.studioModal.classList.remove('active'));
@@ -2174,7 +2273,6 @@
                 if (e.target === UI.studioModal) UI.studioModal.classList.remove('active');
             });
 
-            // Theme Preset Selection
             document.querySelectorAll('.theme-preset-btn').forEach(btn => {
                 btn.addEventListener('click', () => {
                     const t = btn.dataset.theme;
@@ -2187,7 +2285,6 @@
                 });
             });
 
-            // Live Custom Color Pickers
             document.querySelectorAll('input[type="color"]').forEach(picker => {
                 picker.addEventListener('input', (e) => {
                     const prop = e.target.dataset.prop;
@@ -2209,7 +2306,6 @@
                 });
             });
 
-            // Reset Theme to Default
             UI.btnResetThemeDefaults.addEventListener('click', () => {
                 State.activeTheme = 'midnight-blue';
                 State.customColors = {};
