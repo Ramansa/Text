@@ -7,8 +7,8 @@
     
     <!-- Primary SEO Meta Tags -->
     <meta name="title" content="DevSuite | Professional Offline Developer Utilities & Security Suite">
-    <meta name="description" content="All-in-one privacy-first developer utility suite: UTF-8 Base64, URL encoder, JSON formatter, Multi-language code minifier, JWT inspector, HTML entities, and MD5/SHA cryptographic hash generators. 100% offline and client-side.">
-    <meta name="keywords" content="developer tools, base64 encoder utf-8, jwt decoder, json beautifier, code minifier, md5 hash generator, sha256 generator, url encoder, offline devsuite, formatting tools, privacy developer utilities">
+    <meta name="description" content="All-in-one privacy-first developer utility suite: UTF-8 Base64, URL encoder, JSON formatter, Multi-language code minifier, JWT inspector, HTML entities, Text Case Converter (Smart Propercase, Uppercase, Lowercase), and MD5/SHA cryptographic hash generators. 100% offline and client-side.">
+    <meta name="keywords" content="developer tools, proper case converter, smart title case, uppercase converter, lowercase converter, base64 encoder utf-8, jwt decoder, json beautifier, code minifier, md5 hash generator, sha256 generator, url encoder, offline devsuite, formatting tools, privacy developer utilities">
     <meta name="author" content="DevSuite Open Platform">
     <meta name="robots" content="index, follow">
     <meta name="theme-color" content="#0b1120">
@@ -16,7 +16,7 @@
     <!-- Open Graph / Facebook -->
     <meta property="og:type" content="website">
     <meta property="og:title" content="DevSuite | Professional Offline Developer Utilities & Security Suite">
-    <meta property="og:description" content="High-performance client-side toolset for developers. Encode, decode, format, hash, and inspect tokens with zero server roundtrips.">
+    <meta property="og:description" content="High-performance client-side toolset for developers. Encode, decode, format, convert case styles, hash, and inspect tokens with zero server roundtrips.">
     <meta property="og:site_name" content="DevSuite">
 
     <!-- Twitter Cards -->
@@ -40,7 +40,7 @@
             "price": "0",
             "priceCurrency": "USD"
           },
-          "description": "Privacy-focused developer utilities including Base64 UTF-8 safe encode/decode, JWT payload inspector, code formatters, and cryptographic hash generators."
+          "description": "Privacy-focused developer utilities including Base64 UTF-8 safe encode/decode, Smart Propercase/Title Case converter, JWT payload inspector, code formatters, and cryptographic hash generators."
         },
         {
           "@type": "FAQPage",
@@ -50,7 +50,15 @@
               "name": "Is my data secure when using DevSuite?",
               "acceptedAnswer": {
                 "@type": "Answer",
-                "text": "Yes, 100%. All operations—including hashing, Base64 conversion, JWT parsing, and code formatting—run entirely in your local browser sandbox using client-side JavaScript. No data is transmitted to external servers."
+                "text": "Yes, 100%. All operations—including hashing, Base64 conversion, JWT parsing, text case conversions, and code formatting—run entirely in your local browser sandbox using client-side JavaScript. No data is transmitted to external servers."
+              }
+            },
+            {
+              "@type": "Question",
+              "name": "How does Smart Propercase handle minor English words like 'of', 'in', or 'the'?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "Our smart title/proper case algorithm follows standard English editorial style rules (Chicago Manual of Style / AP). It keeps articles, short prepositions, and coordinating conjunctions (such as 'of', 'in', 'on', 'and', 'the', 'for') in lowercase, while ensuring the first and last words of sentences and titles are always properly capitalized."
               }
             },
             {
@@ -962,15 +970,26 @@
                     <!-- FAQ 1 -->
                     <div class="faq-item open">
                         <div class="faq-question">
-                            <span>How is data privacy guaranteed on DevSuite?</span>
+                            <span>How does the Smart Propercase / Title Case tool work?</span>
                             <svg class="faq-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
                         </div>
                         <div class="faq-answer">
-                            DevSuite is completely offline and serverless. All encoding, decoding, JSON formatting, token inspecting, and cryptographic hashing operations execute exclusively inside your browser using native JavaScript and the W3C Web Cryptography API. No payload or user input is ever sent over the network.
+                            Standard naive title casing capitalizes every word blindly (e.g. <em>"The Lord Of The Rings"</em>). DevSuite's Smart Propercase algorithm follows established editorial style guides (Chicago / AP style): short prepositions, articles, and conjunctions (e.g., <em>of, in, at, on, to, for, and, but, the, a, an</em>) remain lowercase unless they appear at the start or end of a title or after sentence-ending punctuation. Hyphenated compound words are also parsed with precision.
                         </div>
                     </div>
 
                     <!-- FAQ 2 -->
+                    <div class="faq-item">
+                        <div class="faq-question">
+                            <span>How is data privacy guaranteed on DevSuite?</span>
+                            <svg class="faq-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                        </div>
+                        <div class="faq-answer">
+                            DevSuite is completely offline and serverless. All encoding, decoding, JSON formatting, token inspecting, text casing, and cryptographic hashing operations execute exclusively inside your browser using native JavaScript and the W3C Web Cryptography API. No payload or user input is ever sent over the network.
+                        </div>
+                    </div>
+
+                    <!-- FAQ 3 -->
                     <div class="faq-item">
                         <div class="faq-question">
                             <span>Why doesn't standard Base64 handle emojis without corrupting?</span>
@@ -981,7 +1000,7 @@
                         </div>
                     </div>
 
-                    <!-- FAQ 3 -->
+                    <!-- FAQ 4 -->
                     <div class="faq-item">
                         <div class="faq-question">
                             <span>How does the JWT (JSON Web Token) Decoder work?</span>
@@ -992,7 +1011,7 @@
                         </div>
                     </div>
 
-                    <!-- FAQ 4 -->
+                    <!-- FAQ 5 -->
                     <div class="faq-item">
                         <div class="faq-question">
                             <span>When should I use MD5 vs SHA-256 or SHA-512?</span>
@@ -1003,21 +1022,10 @@
                             <strong>SHA-256 & SHA-512:</strong> Cryptographically secure NIST-approved standards recommended for digital signatures, blockchain blocks, and data integrity verification.
                         </div>
                     </div>
-
-                    <!-- FAQ 5 -->
-                    <div class="faq-item">
-                        <div class="faq-question">
-                            <span>Can DevSuite be used offline without an internet connection?</span>
-                            <svg class="faq-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
-                        </div>
-                        <div class="faq-answer">
-                            Yes. DevSuite is completely self-contained in a single HTML file with zero external script or styling dependencies. You can save this file directly to your disk or USB drive and open it in any modern browser without an active internet connection.
-                        </div>
-                    </div>
                 </div>
 
                 <div class="mt-4 flex justify-between items-center">
-                    <span class="text-xs opacity-60">DevSuite v2.6 • Privacy-First Architecture</span>
+                    <span class="text-xs opacity-60">DevSuite v2.7 • Privacy-First Architecture</span>
                     <button id="btnDoneDocs" class="primary text-sm">Close Guide</button>
                 </div>
             </div>
@@ -1219,7 +1227,60 @@
             return new TextDecoder().decode(bytes);
         }
 
-        // 4. Standalone Multi-Language Code Formatter & Minifier
+        // 4. Smart English Propercase / Title Case Algorithm
+        function toSmartProperCase(str) {
+            if (!str) return '';
+
+            // Set of standard English minor words that remain lowercase in titles
+            const minorWords = new Set([
+                'a', 'an', 'the',
+                'and', 'but', 'or', 'for', 'nor', 'so', 'yet',
+                'as', 'at', 'by', 'for', 'in', 'of', 'off', 'on', 'per', 'to', 'up', 'via', 'with'
+            ]);
+
+            return str.replace(/\b([A-Za-z0-9]+(?:'[A-Za-z0-9]+)?|-)\b/g, (match, word, offset, fullString) => {
+                // If the token is punctuation like a hyphen, return as is
+                if (word === '-') return word;
+
+                const lowerWord = word.toLowerCase();
+
+                // Determine if this word is the first word of the text or of a sentence
+                const precedingSlice = fullString.slice(0, offset).trim();
+                const isStart = precedingSlice.length === 0 || /[.!?:\n]\s*$/.test(fullString.slice(0, offset));
+
+                // Determine if this word is the last word in the text or before a major punctuation mark
+                const followingSlice = fullString.slice(offset + match.length).trim();
+                const isEnd = followingSlice.length === 0 || /^[.!?:\n]/.test(followingSlice);
+
+                // Handle hyphenated compound words (e.g., "State-of-the-Art")
+                if (word.includes('-')) {
+                    return word.split('-').map((subWord, idx) => {
+                        const lowerSub = subWord.toLowerCase();
+                        if (idx > 0 && minorWords.has(lowerSub)) {
+                            return lowerSub;
+                        }
+                        return subWord.charAt(0).toUpperCase() + subWord.slice(1).toLowerCase();
+                    }).join('-');
+                }
+
+                // If it's a minor word and NOT at the start or end of a sentence/title, keep it lower
+                if (minorWords.has(lowerWord) && !isStart && !isEnd) {
+                    return lowerWord;
+                }
+
+                // Otherwise capitalize first character, lowercase the rest
+                return word.charAt(0).toUpperCase() + word.slice(1).toLowerCase();
+            });
+        }
+
+        // Sentence Case helper
+        function toSentenceCase(str) {
+            return str.toLowerCase().replace(/(^\s*|[.!?]\s+|\n\s*)([a-z])/g, (m, sep, char) => {
+                return sep + char.toUpperCase();
+            });
+        }
+
+        // 5. Standalone Multi-Language Code Formatter & Minifier
         const CodeProcessors = {
             javascript: {
                 format: (code) => {
@@ -1356,6 +1417,53 @@
          * Global Tools Registry & Educational Specs
          */
         const ToolsRegistry = {
+            // --- Text Case Converters ---
+            'case-proper': {
+                name: 'Smart Propercase',
+                category: 'Text Transformers',
+                desc: 'Smart Title/Proper case: keeps minor English words like "of", "the", "in", and "and" lowercase.',
+                sample: 'the lord of the rings: the fellowship of the ring and a tale of two cities',
+                canSwap: true,
+                mechanism: 'Lexical analysis respecting English editorial style rules (Chicago/AP). Articles, conjunctions, and short prepositions stay lower unless starting or ending a sentence.',
+                compliance: 'Chicago Manual of Style §8.155–8.159 / AP Stylebook Title Guidelines',
+                security: '100% offline client execution without network transit.',
+                run: (input) => toSmartProperCase(input)
+            },
+            'case-lower': {
+                name: 'lowercase',
+                category: 'Text Transformers',
+                desc: 'Convert all letters in the text to lowercase characters.',
+                sample: 'CONVERT ALL THIS UPPERCASE TEXT TO CLEAN LOWERCASE CHARACTERS.',
+                canSwap: true,
+                mechanism: 'Unicode-aware string toLowerCase transformation.',
+                compliance: 'ECMAScript Standard String.prototype.toLowerCase()',
+                security: 'Safe client-side formatting.',
+                run: (input) => input.toLowerCase()
+            },
+            'case-upper': {
+                name: 'UPPERCASE',
+                category: 'Text Transformers',
+                desc: 'Convert all letters in the text to uppercase characters.',
+                sample: 'convert all this lowercase text to bold uppercase characters.',
+                canSwap: true,
+                mechanism: 'Unicode-aware string toUpperCase transformation.',
+                compliance: 'ECMAScript Standard String.prototype.toUpperCase()',
+                security: 'Safe client-side formatting.',
+                run: (input) => input.toUpperCase()
+            },
+            'case-sentence': {
+                name: 'Sentence case',
+                category: 'Text Transformers',
+                desc: 'Capitalize the first letter of each sentence while preserving sentence boundaries.',
+                sample: 'hello world! this is devsuite. let us test smart sentence casing? it works smoothly.',
+                canSwap: true,
+                mechanism: 'Regex tokenization scanning punctuation boundaries (. ! ? \\n) to capitalize beginnings.',
+                compliance: 'English Grammatical Sentence Formatting',
+                security: 'Client-side processing.',
+                run: (input) => toSentenceCase(input)
+            },
+
+            // --- Encoders & Decoders ---
             'b64-enc': {
                 name: 'Base64 Encoder',
                 category: 'Encoders & Decoders',
@@ -1425,11 +1533,13 @@
                     return doc.documentElement.textContent || '';
                 }
             },
+
+            // --- JSON Tools ---
             'json-fmt': {
                 name: 'JSON Beautifier',
                 category: 'JSON Tools',
                 desc: 'Parse, validate, and format JSON with custom indentation spaces.',
-                sample: '{"name":"DevSuite","version":"2.6.0","settings":{"theme":"midnight-blue","offline":true},"features":["base64","jwt","hashes","formatters"]}',
+                sample: '{"name":"DevSuite","version":"2.7.0","settings":{"theme":"midnight-blue","offline":true},"features":["base64","jwt","hashes","propercase","formatters"]}',
                 showIndent: true,
                 mechanism: 'Validates structure via ECMAScript JSON grammar tree and formats with selected spacing.',
                 compliance: 'ECMA-404 JSON Data Interchange Standard',
@@ -1450,6 +1560,8 @@
                 security: 'Reduces network payload sizes in REST/GraphQL responses.',
                 run: (input) => JSON.stringify(JSON.parse(input))
             },
+
+            // --- Code Formatters ---
             'code-fmt': {
                 name: 'Code Formatter',
                 category: 'Code Tools',
@@ -1472,6 +1584,8 @@
                 security: 'Strips proprietary development comments and decreases asset payload weight.',
                 run: (input, opts) => CodeProcessors[opts.lang].minify(input)
             },
+
+            // --- Cryptography & Hashes ---
             'hash-inspect': {
                 name: 'All Hashes Generator',
                 category: 'Cryptography',
@@ -1641,7 +1755,7 @@
          * State Controller & Application Initialization
          */
         const State = {
-            activeTool: localStorage.getItem('devsuite_active_tool') || 'b64-enc',
+            activeTool: localStorage.getItem('devsuite_active_tool') || 'case-proper',
             activeTheme: localStorage.getItem('devsuite_active_theme') || 'midnight-blue',
             customColors: JSON.parse(localStorage.getItem('devsuite_custom_colors') || '{}'),
             drafts: JSON.parse(localStorage.getItem('devsuite_tool_drafts') || '{}'),
@@ -1786,7 +1900,7 @@
 
         // Switch Active Tool
         function switchTool(toolId) {
-            if (!ToolsRegistry[toolId]) toolId = 'b64-enc';
+            if (!ToolsRegistry[toolId]) toolId = 'case-proper';
             State.activeTool = toolId;
             localStorage.setItem('devsuite_active_tool', toolId);
 
