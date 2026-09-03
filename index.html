@@ -906,6 +906,10 @@
                             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="4 17 10 11 4 5"></polyline><line x1="12" y1="19" x2="20" y2="19"></line></svg>
                             Source Input
                         </div>
+                        <button id="btnCopyInput" class="primary py-1 px-3">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+                            Copy Input
+                        </button>
                     </div>
                     <div class="editor-wrapper">
                         <textarea id="inputEditor" class="code-editor" placeholder="Type, paste, or load sample data here..." spellcheck="false"></textarea>
@@ -1239,20 +1243,16 @@
             ]);
 
             return str.replace(/\b([A-Za-z0-9]+(?:'[A-Za-z0-9]+)?|-)\b/g, (match, word, offset, fullString) => {
-                // If the token is punctuation like a hyphen, return as is
                 if (word === '-') return word;
 
                 const lowerWord = word.toLowerCase();
 
-                // Determine if this word is the first word of the text or of a sentence
                 const precedingSlice = fullString.slice(0, offset).trim();
                 const isStart = precedingSlice.length === 0 || /[.!?:\n]\s*$/.test(fullString.slice(0, offset));
 
-                // Determine if this word is the last word in the text or before a major punctuation mark
                 const followingSlice = fullString.slice(offset + match.length).trim();
                 const isEnd = followingSlice.length === 0 || /^[.!?:\n]/.test(followingSlice);
 
-                // Handle hyphenated compound words (e.g., "State-of-the-Art")
                 if (word.includes('-')) {
                     return word.split('-').map((subWord, idx) => {
                         const lowerSub = subWord.toLowerCase();
@@ -1263,12 +1263,10 @@
                     }).join('-');
                 }
 
-                // If it's a minor word and NOT at the start or end of a sentence/title, keep it lower
                 if (minorWords.has(lowerWord) && !isStart && !isEnd) {
                     return lowerWord;
                 }
 
-                // Otherwise capitalize first character, lowercase the rest
                 return word.charAt(0).toUpperCase() + word.slice(1).toLowerCase();
             });
         }
@@ -1785,6 +1783,7 @@
             btnClearInput: document.getElementById('btnClearInput'),
             inputEditor: document.getElementById('inputEditor'),
             outputEditor: document.getElementById('outputEditor'),
+            btnCopyInput: document.getElementById('btnCopyInput'),
             btnCopyOutput: document.getElementById('btnCopyOutput'),
             inChars: document.getElementById('inChars'),
             inWords: document.getElementById('inWords'),
@@ -2084,32 +2083,45 @@
                 UI.toolSpecDrawer.classList.add('open');
             }
 
-            // Clipboard Copy
+            // Generic Clipboard Copy Function
+            function copyTextToClipboard(text, targetEl, successMessage) {
+                if (!text) {
+                    triggerToast('Nothing to copy', 'warning');
+                    return;
+                }
+                if (navigator.clipboard && window.isSecureContext) {
+                    navigator.clipboard.writeText(text).then(() => {
+                        triggerToast(successMessage);
+                    }).catch(() => fallbackCopy(targetEl, successMessage));
+                } else {
+                    fallbackCopy(targetEl, successMessage);
+                }
+            }
+
+            function fallbackCopy(targetEl, successMessage) {
+                targetEl.select();
+                try {
+                    document.execCommand('copy');
+                    triggerToast(successMessage);
+                } catch {
+                    triggerToast('Failed to copy to clipboard', 'error');
+                }
+            }
+
+            // Clipboard Copy - Source Input
+            UI.btnCopyInput.addEventListener('click', () => {
+                copyTextToClipboard(UI.inputEditor.value, UI.inputEditor, 'Copied input to clipboard!');
+            });
+
+            // Clipboard Copy - Processed Output
             UI.btnCopyOutput.addEventListener('click', () => {
                 const val = UI.outputEditor.value;
                 if (!val || UI.outputEditor.classList.contains('output-has-error')) {
                     triggerToast('Nothing to copy', 'warning');
                     return;
                 }
-
-                if (navigator.clipboard && window.isSecureContext) {
-                    navigator.clipboard.writeText(val).then(() => {
-                        triggerToast('Copied output to clipboard!');
-                    }).catch(() => fallbackCopy(val));
-                } else {
-                    fallbackCopy(val);
-                }
+                copyTextToClipboard(val, UI.outputEditor, 'Copied output to clipboard!');
             });
-
-            function fallbackCopy(text) {
-                UI.outputEditor.select();
-                try {
-                    document.execCommand('copy');
-                    triggerToast('Copied output to clipboard!');
-                } catch {
-                    triggerToast('Failed to copy to clipboard', 'error');
-                }
-            }
 
             // Options Listeners
             UI.codeLangSelect.addEventListener('change', (e) => {
