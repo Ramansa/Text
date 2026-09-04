@@ -60,4 +60,6 @@
 
 Because DevSuite requires no build steps, node modules, or bundlers, deployment is as simple as opening a single file:
 
-1. **Download** or clone the repository
+1. **Download** or clone the repository:
+   ```bash
+   git clone [https://github.com/Ramansa/Text.git](https://github.com/Ramansa/Text.git)
