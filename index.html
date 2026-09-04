@@ -7,8 +7,8 @@
     
     <!-- Primary SEO Meta Tags -->
     <meta name="title" content="DevSuite | Professional Offline Developer Utilities & Security Suite">
-    <meta name="description" content="All-in-one privacy-first developer utility suite: UTF-8 Base64, URL encoder, JSON formatter, Multi-language code formatter and minifier (HTML, CSS, JS, PHP, SQL), JWT inspector, HTML entities, Text Case Converter, and cryptographic hash generators. 100% offline and client-side.">
-    <meta name="keywords" content="developer tools, code formatter, multi language formatter, php html formatter, proper case converter, smart title case, uppercase converter, lowercase converter, base64 encoder utf-8, jwt decoder, json beautifier, code minifier, md5 hash generator, sha256 generator, url encoder, offline devsuite">
+    <meta name="description" content="All-in-one privacy-first developer utility suite: Text Sanitizer & MS Word Normalizer, UTF-8 Base64, URL encoder, JSON formatter, Multi-language code formatter (HTML, CSS, JS, PHP, SQL), JWT inspector, HTML entities, Text Case Converter, and cryptographic hash generators. 100% offline and client-side.">
+    <meta name="keywords" content="text sanitizer, word character cleaner, trim text, remove word dashes, smart quotes cleaner, 2026 unicode emojis, alphanumeric cleaner, developer tools, code formatter, multi language formatter, php html formatter, proper case converter, smart title case, uppercase converter, lowercase converter, base64 encoder utf-8, jwt decoder, json beautifier, code minifier, md5 hash generator, sha256 generator, url encoder, offline devsuite">
     <meta name="author" content="DevSuite Open Platform">
     <meta name="robots" content="index, follow">
     <meta name="theme-color" content="#0b1120">
@@ -16,7 +16,7 @@
     <!-- Open Graph / Facebook -->
     <meta property="og:type" content="website">
     <meta property="og:title" content="DevSuite | Professional Offline Developer Utilities & Security Suite">
-    <meta property="og:description" content="High-performance client-side toolset for developers. Encode, decode, format, convert case styles, hash, and inspect tokens with zero server roundtrips.">
+    <meta property="og:description" content="High-performance client-side toolset for developers. Sanitize MS Word text, encode, decode, format, convert case styles, hash, and inspect tokens with zero server roundtrips.">
     <meta property="og:site_name" content="DevSuite">
 
     <!-- Twitter Cards -->
@@ -40,17 +40,25 @@
             "price": "0",
             "priceCurrency": "USD"
           },
-          "description": "Privacy-focused developer utilities including Base64 UTF-8 safe encode/decode, Smart Propercase/Title Case converter, JWT payload inspector, multi-language code formatters, and cryptographic hash generators."
+          "description": "Privacy-focused developer utilities including Text Sanitizer and MS Word Normalizer, Base64 UTF-8 safe encode/decode, Smart Propercase/Title Case converter, JWT payload inspector, multi-language code formatters, and cryptographic hash generators."
         },
         {
           "@type": "FAQPage",
           "mainEntity": [
             {
               "@type": "Question",
+              "name": "How does the Text Sanitizer & Word Normalizer clean Microsoft Word characters?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "Microsoft Word routinely auto-replaces typed keystrokes with typographical characters such as en-dashes (–), em-dashes (—), fullwidth underscores (＿), curly smart quotes (“ ” ‘ ’), horizontal ellipsis (…), and non-breaking spaces. The DevSuite Sanitizer normalizes these to readable standard ASCII hyphens (-), underscores (_), and straight quotes, trims leading and trailing whitespace, and preserves alphanumeric text, standard symbols, and modern Unicode 2026 emojis."
+              }
+            },
+            {
+              "@type": "Question",
               "name": "Is my data secure when using DevSuite?",
               "acceptedAnswer": {
                 "@type": "Answer",
-                "text": "Yes, 100%. All operations—including hashing, Base64 conversion, JWT parsing, text case conversions, and code formatting—run entirely in your local browser sandbox using client-side JavaScript. No data is transmitted to external servers."
+                "text": "Yes, 100%. All operations—including text cleaning, hashing, Base64 conversion, JWT parsing, text case conversions, and code formatting—run entirely in your local browser sandbox using client-side JavaScript. No data is transmitted to external servers."
               }
             },
             {
@@ -481,7 +489,7 @@
             color: var(--text);
             tab-size: 4;
             white-space: pre-wrap;
-            word-break: break-all;
+            word-break: break-word;
         }
 
         textarea.code-editor::placeholder {
@@ -547,7 +555,7 @@
         }
 
         .modal-box.large {
-            max-width: 720px;
+            max-width: 760px;
         }
 
         .modal-overlay.active .modal-box {
@@ -815,17 +823,25 @@
                 <div class="tool-heading">
                     <div>
                         <div class="flex items-center gap-2">
-                            <span class="tool-title" id="activeToolName">Code Formatter</span>
+                            <span class="tool-title" id="activeToolName">Text Sanitizer & Word Fixer</span>
                             <button id="btnToggleSpecs" class="text-xs py-1 px-2" title="Toggle technical specifications and documentation">
                                 <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
                                 Tool Specs
                             </button>
                         </div>
-                        <div class="tool-desc" id="activeToolDesc">Format JS, HTML (with CSS/JS), PHP (with HTML/CSS/JS), CSS, or SQL with auto-detection.</div>
+                        <div class="tool-desc" id="activeToolDesc">Trim text, normalize MS Word smart dashes/quotes, and filter to alphanumeric, symbols, & 2026 Unicode emojis.</div>
                     </div>
                 </div>
 
                 <div class="flex items-center gap-2" id="toolControls">
+                    <select id="cleanModeSelect" class="hidden">
+                        <option value="smart-all" selected>Full Sanitize (Word Fix + Safe Symbols + 2026 Icons)</option>
+                        <option value="strict-alnum">Strict Alphanumeric & Space Only</option>
+                        <option value="alnum-symbols-emoji">Alphanumeric, Symbols & 2026 Emojis</option>
+                        <option value="word-fix-only">MS Word Normalizer Only (Quotes, Dashes, Spaces)</option>
+                        <option value="trim-whitespace">Trim & Normalize Whitespace Only</option>
+                    </select>
+
                     <select id="codeLangSelect" class="hidden">
                         <option value="auto" selected>Auto Detect</option>
                         <option value="javascript">JavaScript</option>
@@ -945,6 +961,16 @@
                 <div id="faqList">
                     <div class="faq-item open">
                         <div class="faq-question">
+                            <span>How does the Text Sanitizer & Word Normalizer work?</span>
+                            <svg class="faq-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                        </div>
+                        <div class="faq-answer">
+                            When users type or paste text from Microsoft Word, Word automatically replaces hyphens and quotes with non-standard typographical characters: en-dashes (<code>–</code>), em-dashes (<code>—</code>), fullwidth underscores (<code>＿</code>), curly quotes (<code>“ ” ‘ ’</code>), and non-breaking spaces (<code>\u00A0</code>). Our sanitizer converts them back to standard ASCII hyphens (<code>-</code>), underscores (<code>_</code>), and straight quotes, trims redundant whitespace, eliminates hidden zero-width spaces (<code>\u200B</code>), and preserves modern Unicode icons and emojis up through Unicode 16.0 (2026).
+                        </div>
+                    </div>
+
+                    <div class="faq-item">
+                        <div class="faq-question">
                             <span>How does Multi-Language Code Formatting work?</span>
                             <svg class="faq-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
                         </div>
@@ -996,7 +1022,7 @@
                 </div>
 
                 <div class="mt-4 flex justify-between items-center">
-                    <span class="text-xs opacity-60">DevSuite v2.8 • Offline Multi-Language Architecture</span>
+                    <span class="text-xs opacity-60">DevSuite v2.9 • Offline Multi-Language & Text Suite</span>
                     <button id="btnDoneDocs" class="primary text-sm">Close Guide</button>
                 </div>
             </div>
@@ -1167,7 +1193,6 @@
             };
         })();
 
-        // 2. WebCrypto Hash Calculation Wrapper
         async function calculateDigest(algorithm, text) {
             const buffer = new TextEncoder().encode(text);
             const digest = await crypto.subtle.digest(algorithm, buffer);
@@ -1176,7 +1201,6 @@
                 .join('');
         }
 
-        // 3. UTF-8 Safe Base64
         function utf8ToBase64(str) {
             const bytes = new TextEncoder().encode(str);
             let binary = '';
@@ -1194,6 +1218,127 @@
                 bytes[i] = binary.charCodeAt(i);
             }
             return new TextDecoder().decode(bytes);
+        }
+
+        /**
+         * Comprehensive MS Word Character Normalizer & Text Sanitizer
+         * Normalizes MS Word special typography (en/em dashes, underscores, smart quotes, bullets)
+         * Trims text and filters for alphanumeric, spaces, safe symbols, and modern 2026 Unicode emojis.
+         */
+        function sanitizeText(input, mode = 'smart-all') {
+            if (!input) return '';
+
+            let text = input;
+
+            // 1. Comprehensive MS Word typography replacements
+            const wordReplacements = [
+                // En dash (–), Em dash (—), horizontal bar (―), minus sign (−), figure dash (‒), fullwidth hyphens -> '-'
+                [/[\u2013\u2014\u2015\u2212\u2012\uFE63\uFF0D\u2011]/g, '-'],
+                // Fullwidth low line (＿), modifier letter low line (ˍ) -> '_'
+                [/[\uFF3F\u02CD]/g, '_'],
+                // Left & right double curly quotes (“ ”), double low-9 („ ‟), double prime (″ ‶), guillemets (« »), fullwidth quotes (＂) -> '"'
+                [/[\u201C\u201D\u201E\u201F\u2033\u2036\u00AB\u00BB\uFF02]/g, '"'],
+                // Left & right single curly quotes (‘ ’), single low-9 (‚ ‛), prime (′ ‵), backtick (`) -> "'"
+                [/[\u2018\u2019\u201A\u201B\u2032\u2035`]/g, "'"],
+                // Horizontal ellipsis (…) -> '...'
+                [/\u2026/g, '...'],
+                // Word list bullets (• ‣ ⁃ ◦ ▪ ▫ ● ○) -> '- '
+                [/[\u2022\u2023\u2043\u25AA\u25AB\u25CF\u25CB\u25E6]/g, '- '],
+                // Typographical ligatures
+                [/\uFB00/g, 'ff'],
+                [/\uFB01/g, 'fi'],
+                [/\uFB02/g, 'fl'],
+                [/\uFB03/g, 'ffi'],
+                [/\uFB04/g, 'ffl'],
+                [/\u00E6/g, 'ae'],
+                [/\u00C6/g, 'Ae'],
+                [/\u0153/g, 'oe'],
+                [/\u0152/g, 'Oe'],
+                // Word copyright, trademark, and symbols
+                [/\u00A9/g, '(c)'],
+                [/\u00AE/g, '(r)'],
+                [/\u2122/g, '(tm)'],
+                // Fractions
+                [/\u00BD/g, '1/2'],
+                [/\u00BC/g, '1/4'],
+                [/\u00BE/g, '3/4'],
+                [/\u2153/g, '1/3'],
+                [/\u2154/g, '2/3'],
+                // Non-breaking spaces and unusual typographic spaces -> standard space
+                [/[\u00A0\u202F\u2007\u2000-\u200A\u3000]/g, ' '],
+                // Invisible zero-width chars and soft hyphens -> completely stripped
+                [/[\u200B\uFEFF\u00AD\u200E\u200F]/g, '']
+            ];
+
+            if (mode === 'trim-whitespace') {
+                text = text.replace(/[\u00A0\u202F\u2007\u2000-\u200A\u3000]/g, ' ');
+                text = text.replace(/[\u200B\uFEFF\u00AD]/g, '');
+                text = text.replace(/\r\n/g, '\n').replace(/\r/g, '\n');
+                text = text.split('\n').map(line => line.replace(/[ \t]+$/, '')).join('\n');
+                text = text.replace(/[ \t]+/g, ' ');
+                text = text.replace(/\n{3,}/g, '\n\n');
+                return text.trim();
+            }
+
+            if (mode === 'word-fix-only') {
+                for (const [pattern, replacement] of wordReplacements) {
+                    text = text.replace(pattern, replacement);
+                }
+                text = text.replace(/\r\n/g, '\n').replace(/\r/g, '\n');
+                text = text.split('\n').map(line => line.replace(/[ \t]+$/, '')).join('\n');
+                text = text.replace(/[ \t]+/g, ' ');
+                text = text.replace(/\n{3,}/g, '\n\n');
+                return text.trim();
+            }
+
+            // Apply MS Word normalizations for all other modes
+            for (const [pattern, replacement] of wordReplacements) {
+                text = text.replace(pattern, replacement);
+            }
+
+            // Normalize line endings
+            text = text.replace(/\r\n/g, '\n').replace(/\r/g, '\n');
+
+            if (mode === 'strict-alnum') {
+                // Strict mode: Only alphanumeric (letters and numbers) and spaces/newlines
+                text = text.replace(/[-_]/g, ' ');
+                text = text.replace(/[^\p{L}\p{N}\s]/gu, '');
+                text = text.split('\n').map(line => line.replace(/[ \t]+/g, ' ').trim()).join('\n');
+                text = text.replace(/\n{3,}/g, '\n\n');
+                return text.trim();
+            }
+
+            // Unicode 16.0 / 2026 Extended Pictographic and Emoji Sequence Regex
+            // Matches emojis, skin tones, ZWJ combinations (e.g. Phoenix, Lime, Family, Flags, Keycaps)
+            const emojiRegex = /(?:\p{Extended_Pictographic}(?:\uFE0F|\uFE0E)?(?:[\u{1F3FB}-\u{1F3FF}])?(?:\u200D\p{Extended_Pictographic}(?:\uFE0F|\uFE0E)?(?:[\u{1F3FB}-\u{1F3FF}]?))*|[\u{1F1E6}-\u{1F1FF}]{2}|[0-9#*]\uFE0F?\u20E3)/gu;
+
+            if (mode === 'smart-all' || mode === 'alnum-symbols-emoji') {
+                const emojiPlaceholders = [];
+                // Temporarily protect emojis from character whitelist stripping
+                text = text.replace(emojiRegex, (match) => {
+                    const placeholder = `\uE000__EMOJI_${emojiPlaceholders.length}__\uE001`;
+                    emojiPlaceholders.push(match);
+                    return placeholder;
+                });
+
+                // Whitelist:
+                // Letters (\p{L}), Numbers (\p{N}), Whitespace (\s)
+                // Common punctuation and symbols: ! " # $ % & ' ( ) * + , - . / : ; < = > ? @ [ \ ] ^ _ ` { | } ~ € £ ¥ ₹ ₩ ₽ ¢ § ± ° µ ¶ × ÷
+                // And the temporary emoji delimiters (\uE000 and \uE001)
+                text = text.replace(/[^\p{L}\p{N}\s!"#$%&'()*+,\-./:;<=>?@[\\\]^_`{|}~€£¥₹₩₽¢§±°µ¶×÷\uE000\uE001]/gu, '');
+
+                // Re-inject preserved emojis
+                text = text.replace(/\uE000__EMOJI_(\d+)__\uE001/g, (_, id) => {
+                    return emojiPlaceholders[parseInt(id, 10)] || '';
+                });
+            }
+
+            // Clean line ends, collapse redundant spaces, and clean multiple blank lines
+            text = text.split('\n').map(line => line.replace(/[ \t]+$/, '')).join('\n');
+            text = text.replace(/[ \t]+/g, ' ');
+            text = text.replace(/\n{3,}/g, '\n\n');
+
+            return text.trim();
         }
 
         // 4. Smart English Propercase / Title Case Algorithm
@@ -1330,7 +1475,7 @@
                 format: (html, baseIndent = 0) => {
                     const subBlocks = [];
 
-                    // 1. Isolate <style> using split strings to prevent premature tag closing
+                    // 1. Isolate <style> safely
                     const styleRegex = new RegExp('<style\\b([^>]*)>([\\s\\S]*?)<\\/style>', 'gi');
                     let processed = html.replace(styleRegex, (match, attrs, content) => {
                         const marker = `___CSS_BLOCK_${subBlocks.length}___`;
@@ -1341,7 +1486,7 @@
                         return '<style' + attrs + '>\n' + marker + '\n<' + '/style>';
                     });
 
-                    // 2. Isolate <script> safely using split strings
+                    // 2. Isolate <script> safely
                     const scriptRegex = new RegExp('<script\\b([^>]*)>([\\s\\S]*?)<\\/script>', 'gi');
                     processed = processed.replace(scriptRegex, (match, attrs, content) => {
                         if (/type\s*=\s*["'](?!text\/javascript|application\/javascript)[^"']+["']/i.test(attrs)) {
@@ -1378,7 +1523,7 @@
                         }
                     });
 
-                    // 4. Re-inject formatted embedded JS and CSS using safe functional replacers
+                    // 4. Re-inject formatted embedded JS and CSS
                     subBlocks.forEach((block, idx) => {
                         const marker = `___${block.type.toUpperCase()}_BLOCK_${idx}___`;
                         const regex = new RegExp(`^(\\s*)${marker}`, 'm');
@@ -1467,6 +1612,18 @@
          * Global Tools Registry & Educational Specs
          */
         const ToolsRegistry = {
+            'text-clean': {
+                name: 'Text Sanitizer & Word Fixer',
+                category: 'Text Transformers',
+                desc: 'Trim text, replace MS Word auto-changed dashes & quotes with readable ASCII, and keep 2026 Unicode emojis.',
+                sample: '   “DevSuite 2026” — Smart Text Sanitizer & Word Fixer…   \n\n• Fixes MS Word en–dashes, em—dashes & fullwidth＿underscores (converts them back to clean - and _).\n• Replaces “smart curly quotes” & ‘apostrophes’ with readable standard ASCII quotes.\n• Purges invisible zero-width\u200B spaces and non-breaking\u00A0spaces.\n• Fully preserves 2026 Unicode Emojis & Icons: 🚀 💡 🛡️ 🐦‍🔥 🍋‍🟩 🍄‍🟫 🫨 🪩\n• Trims extra whitespace and purges corrupt binary artifacts!   ',
+                showCleanMode: true,
+                canSwap: true,
+                mechanism: 'Multi-stage lexical cleaner converting MS Word typographical substitutions (en/em dashes, low-lines, smart quotes, bullets) into clean ASCII equivalents, trimming whitespace, and filtering to alphanumeric, valid punctuation, and modern Unicode 16.0 / 2026 Extended Pictographic sequences.',
+                compliance: 'Unicode Standard 16.0 / RFC 8259 Clean ASCII Fallback / Microsoft Office Interoperability',
+                security: '100% offline client-side sanitization. Strips dangerous hidden zero-width spaces, null bytes, and non-printable control characters.',
+                run: (input, opts) => sanitizeText(input, opts.cleanMode || 'smart-all')
+            },
             'code-fmt': {
                 name: 'Code Formatter',
                 category: 'Code Tools',
@@ -1614,7 +1771,7 @@
                 name: 'JSON Beautifier',
                 category: 'JSON Tools',
                 desc: 'Parse, validate, and format JSON with custom indentation spaces.',
-                sample: '{"name":"DevSuite","version":"2.8.0","settings":{"theme":"midnight-blue","offline":true},"features":["multi-language-code","base64","jwt","hashes","propercase"]}',
+                sample: '{"name":"DevSuite","version":"2.9.0","settings":{"theme":"midnight-blue","offline":true},"features":["text-sanitizer","multi-language-code","base64","jwt","hashes","propercase"]}',
                 showIndent: true,
                 mechanism: 'Validates structure via ECMAScript JSON grammar tree and formats with selected spacing.',
                 compliance: 'ECMA-404 JSON Data Interchange Standard',
@@ -1804,12 +1961,13 @@
          * State Controller & Application Initialization
          */
         const State = {
-            activeTool: localStorage.getItem('devsuite_active_tool') || 'code-fmt',
+            activeTool: localStorage.getItem('devsuite_active_tool') || 'text-clean',
             activeTheme: localStorage.getItem('devsuite_active_theme') || 'midnight-blue',
             customColors: JSON.parse(localStorage.getItem('devsuite_custom_colors') || '{}'),
             drafts: JSON.parse(localStorage.getItem('devsuite_tool_drafts') || '{}'),
             selectedLang: localStorage.getItem('devsuite_code_lang') || 'auto',
             selectedIndent: localStorage.getItem('devsuite_json_indent') || '4',
+            selectedCleanMode: localStorage.getItem('devsuite_clean_mode') || 'smart-all',
             showSpecs: localStorage.getItem('devsuite_show_specs') === 'true'
         };
 
@@ -1826,6 +1984,7 @@
             specMechanism: document.getElementById('specMechanism'),
             specCompliance: document.getElementById('specCompliance'),
             specSecurity: document.getElementById('specSecurity'),
+            cleanModeSelect: document.getElementById('cleanModeSelect'),
             codeLangSelect: document.getElementById('codeLangSelect'),
             jsonIndentSelect: document.getElementById('jsonIndentSelect'),
             btnLoadSample: document.getElementById('btnLoadSample'),
@@ -1945,7 +2104,7 @@
         }
 
         function switchTool(toolId) {
-            if (!ToolsRegistry[toolId]) toolId = 'code-fmt';
+            if (!ToolsRegistry[toolId]) toolId = 'text-clean';
             State.activeTool = toolId;
             localStorage.setItem('devsuite_active_tool', toolId);
 
@@ -1957,6 +2116,7 @@
             UI.specCompliance.textContent = tool.compliance || 'W3C Standard';
             UI.specSecurity.textContent = tool.security || 'Local sandbox execution';
 
+            UI.cleanModeSelect.classList.toggle('hidden', !tool.showCleanMode);
             UI.codeLangSelect.classList.toggle('hidden', !tool.showLang);
             UI.jsonIndentSelect.classList.toggle('hidden', !tool.showIndent);
             UI.btnSwap.classList.toggle('hidden', !tool.canSwap);
@@ -1994,13 +2154,23 @@
                     } else {
                         UI.detectedLangBadge.textContent = `Lang: ${currentLang.toUpperCase()}`;
                     }
+                } else if (tool.showCleanMode) {
+                    const modeMap = {
+                        'smart-all': 'Mode: Full Sanitize',
+                        'strict-alnum': 'Mode: Strict Alnum',
+                        'alnum-symbols-emoji': 'Mode: Symbols & Emojis',
+                        'word-fix-only': 'Mode: Word Fix Only',
+                        'trim-whitespace': 'Mode: Whitespace Only'
+                    };
+                    UI.detectedLangBadge.textContent = modeMap[UI.cleanModeSelect.value] || 'Sanitizer Active';
                 } else {
                     UI.detectedLangBadge.textContent = 'Live Sync';
                 }
 
                 const options = {
                     lang: currentLang,
-                    indent: UI.jsonIndentSelect.value
+                    indent: UI.jsonIndentSelect.value,
+                    cleanMode: UI.cleanModeSelect.value
                 };
 
                 let output = '';
@@ -2161,6 +2331,12 @@
                 copyTextToClipboard(val, UI.outputEditor, 'Copied output to clipboard!');
             });
 
+            UI.cleanModeSelect.addEventListener('change', (e) => {
+                State.selectedCleanMode = e.target.value;
+                localStorage.setItem('devsuite_clean_mode', e.target.value);
+                processActiveTool();
+            });
+
             UI.codeLangSelect.addEventListener('change', (e) => {
                 State.selectedLang = e.target.value;
                 localStorage.setItem('devsuite_code_lang', e.target.value);
@@ -2257,6 +2433,7 @@
                 applyTheme(State.activeTheme);
             }
 
+            UI.cleanModeSelect.value = State.selectedCleanMode;
             UI.codeLangSelect.value = State.selectedLang;
             UI.jsonIndentSelect.value = State.selectedIndent;
 
